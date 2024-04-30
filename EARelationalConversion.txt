@@ -1,1 +1,35 @@
+A(__a1__, a2 a3)
+B(__a1__, b1)
+  a1: FK(A)
+C(__a1__)
 
+E(__e1__, __e2__)
+
+F(__f1__, __f2__, f3)
+G(__g1__)
+
+H(__h1__, h2)
+
+D(__a1__, __f1__, __f2__, __g1__, __h1__, __d1__)
+  a1: FK(A)
+  f1, f2: FK(F), FK(F)
+  g1: FK(G)
+  h1: FK(h)
+
+rCE(__a1__, __e1__, __e2__, rce1)
+  a1: FK(C)
+  e1, e2: FK(E), FK(E)
+
+rAFG(__a1__, __f1__, __g1__)
+  a1: FK(A)
+  f1: FK(F)
+  g1: FK(G)
+
+rHrAFG(__a1__, __f1__, __g1__, __h1__)
+  a1: FK(A)
+  f1: FK(F)
+  g1: FK(G)
+  h1: FK(H)
+
+RI-1 - Cada G só pode ocorrer uma vez para cada par A-F
+(...)
