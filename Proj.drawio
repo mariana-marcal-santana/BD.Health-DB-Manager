@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-04-30T14:43:22.634Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0" etag="iOOrBKbiVQssScgQxK2Q" version="24.3.1" type="github">
+<mxfile host="app.diagrams.net" modified="2024-05-02T09:11:14.254Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" etag="c72rGlgznlub7OfIo6Lt" version="24.3.1" type="github">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-    <mxGraphModel dx="1020" dy="827" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
+    <mxGraphModel dx="650" dy="522" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
@@ -213,12 +213,6 @@
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-6" value="" style="shape=rhombus;html=1;dashed=0;whiteSpace=wrap;perimeter=rhombusPerimeter;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
           <mxGeometry x="1229" y="114" width="60" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="B4XKHxUm8b0waW_bjwol-7" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="Ug5Aab7L-ogycdvRvUgF-1" target="B4XKHxUm8b0waW_bjwol-6" edge="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1090" y="280" as="sourcePoint" />
-            <mxPoint x="1250" y="280" as="targetPoint" />
-          </mxGeometry>
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-8" value="" style="endArrow=none;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-6" edge="1">
           <mxGeometry relative="1" as="geometry">
@@ -559,9 +553,6 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="IjgLaGqV-RNz8sM2G5_5-44" value="1" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" parent="IjgLaGqV-RNz8sM2G5_5-43" connectable="0" vertex="1">
-          <mxGeometry x="1" relative="1" as="geometry" />
-        </mxCell>
         <mxCell id="jm6a07xHTlRLZ0ycuueC-0" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;Relações de Integridade&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;RI-1: Médicos têm uma especialidade escolhida de uma lista de especialidades&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;reconhecidas pela ordem dos médicos;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;RI-2: Médicos podem trabalhar em várias clínicas numa semana mas, em cada dia trabalham só numa;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;RI-3: As consultas só podem decorrer em dias úteis;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;RI-4: Cada consulta decorre num período de 30 minutos a partir de &quot;Start Hour&quot;;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;RI-5: As consultas ocupam espaços de 30 minutos entre as 8:00 e as 20:00;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;RI-6: Cada paciente ou médico só pode ser uma marcação em cada período de tempo;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;RI-7:&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;Sintomas&amp;nbsp;qualitativos têm um nome&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;escolhido de uma lista proveniente do vocabulário controlado SNOMED CT;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;RI-8: M&lt;/span&gt;&lt;span style=&quot;background-color: initial; text-align: center;&quot;&gt;edicamentos são escolhidos a partir da lista oficial do Infarmed.&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
           <mxGeometry x="1421" y="1230" width="690" height="140" as="geometry" />
         </mxCell>
@@ -574,14 +565,20 @@
             <mxPoint x="1740" y="1020" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="CQiO0zF6Q8Tx_IdA4bHp-3" value="" style="shape=link;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-37" target="B4XKHxUm8b0waW_bjwol-42">
+        <mxCell id="CQiO0zF6Q8Tx_IdA4bHp-3" value="" style="shape=link;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-37" target="B4XKHxUm8b0waW_bjwol-42" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1520" y="980" as="sourcePoint" />
             <mxPoint x="1680" y="980" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="CQiO0zF6Q8Tx_IdA4bHp-4" value="" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" connectable="0" vertex="1" parent="CQiO0zF6Q8Tx_IdA4bHp-3">
+        <mxCell id="CQiO0zF6Q8Tx_IdA4bHp-4" value="" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" parent="CQiO0zF6Q8Tx_IdA4bHp-3" connectable="0" vertex="1">
           <mxGeometry x="1" relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SFy1H3z6jbO-ufePMQXo-0" value="" style="shape=link;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="Ug5Aab7L-ogycdvRvUgF-1" target="B4XKHxUm8b0waW_bjwol-6">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1250" y="200" as="sourcePoint" />
+            <mxPoint x="1410" y="200" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
