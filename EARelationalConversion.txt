@@ -2,6 +2,7 @@ A(__a1__, a2 a3)
 B(__a1__, b1)
   a1: FK(A)
 C(__a1__)
+  a1: FK(A)
 
 E(__e1__, __e2__)
 
@@ -20,16 +21,21 @@ rCE(__a1__, __e1__, __e2__, rce1)
   a1: FK(C)
   e1, e2: FK(E), FK(E)
 
-rAFG(__a1__, __f1__, __g1__)
+rAFG(__a1__, __f1__, __f2__, __g1__)
   a1: FK(A)
-  f1: FK(F)
+  f1, f2: FK(F), FK(F)
   g1: FK(G)
 
-rHrAFG(__a1__, __f1__, __g1__, __h1__)
+rHrAFG(__a1__, __f1__, __f2__, __g1__, __h1__)
   a1: FK(A)
-  f1: FK(F)
+  f1, f2: FK(F), FK(F)
   g1: FK(G)
   h1: FK(H)
 
 RI-1 - Cada G só pode ocorrer uma vez para cada par A-F
+RI-2 - Todos os h1 têm de estar em rHrAFG.
+RI-3 - Todos os f1, f2 têm de estar em rAFG.
+RI-4 - A ou é B ou é C, tendo que ser um deles.
+RI-5 - Todos os a1, f1, f2 e g1 em rAFG têm de estar em rHrAFG.
+RI-6 - 
 (...)
