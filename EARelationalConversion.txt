@@ -27,15 +27,16 @@ rAFG(__a1__, __f1__, __f2__, __g1__)
   g1: FK(G)
 
 rHrAFG(__a1__, __f1__, __f2__, __g1__, __h1__)
-  a1: FK(A)
-  f1, f2: FK(F), FK(F)
-  g1: FK(G)
-  h1: FK(H)
+  a1, f1, f2, g1: FK(rAFG)                            \\slide 15 T09
+  h1: FK(H) NOT NULL
+
 
 RI-1 - Cada G só pode ocorrer uma vez para cada par A-F
-RI-2 - Todos os h1 têm de estar em rHrAFG.
-RI-3 - Todos os f1, f2 têm de estar em rAFG.
-RI-4 - A ou é B ou é C, tendo que ser um deles.
+RI-2 - Qualquer h1 em H tem de existir em rHrAFG.
+RI-3 - Qualquer par f1, f2 em F tem de existir em rAFG.
+RI-4 - Cada valor de a1 tem que exister em B ou em C (nunca em ambos simultaneamente).
+
+
 RI-5 - Todos os a1, f1, f2 e g1 em rAFG têm de estar em rHrAFG.
 RI-6 - 
 (...)
