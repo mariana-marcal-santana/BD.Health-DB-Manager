@@ -1,0 +1,7 @@
+Ex1: 
+
+
+
+Ex2: Which is the medical specialty with more appointments? (???)
+
+Ex3: This SQL query retrieves the social security number (SSN) and name of patients who have had more than one consultation.
