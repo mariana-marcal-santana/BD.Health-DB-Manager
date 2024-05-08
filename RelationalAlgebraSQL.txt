@@ -6,4 +6,4 @@ r  ⨝  G max(num_especialidades) (r)
 
 Ex2: Which is the medical specialty with more appointments? (???)
 
-Ex3: This SQL query retrieves the social security number (SSN) and name of patients who have had more than one consultation.
+Ex3: Please write an SQL query that identifies which patients have multiple appointments (more than one) scheduled for the same day. Bearing in mind that the database is structured across two tables: 'patient' (with two columns: Nº_SS and name) and 'appointment' (with two columns: Nº_SS and date).
