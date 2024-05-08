@@ -1,4 +1,6 @@
 Ex1: 
+r  <-  ssn G count-distinct(especialidade)->num_especialidades ( consulta ⨝c.nif=m.nif  medico )
+r  ⨝  G max(num_especialidades) (r) 
 
 
 
