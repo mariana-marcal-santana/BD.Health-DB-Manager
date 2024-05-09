@@ -32,11 +32,11 @@ rHrAFG(__a1__, __f1__, __f2__, __g1__, __h1__,__d1__)
   d1 : FK(D)
 
 
-RI-1 - Cada G só pode ocorrer uma vez para cada par A-F
-RI-2 - Qualquer h1 em H tem de existir em rHrAFG.
-RI-3 - Qualquer par f1, f2 em F tem de existir em rAFG.
-RI-4 - Cada valor de a1 tem que exister em B ou em C (nunca em ambos simultaneamente).
-RI-5 - Todos os a1, f1, f2 e g1 em rAFG têm de estar em rHrAFG.
-RI-6 - Todos os F têm de estar em rAFG
-RI-7 - Todos os H têm de estar em rHrAFG
+RI-1 - Each G can only occur once for each pair A-F.
+RI-2 - Any h1 in H must exist in rHrAFG.
+RI-3 - Any pair f1, f2 in F must exist in rAFG.
+RI-4 - Each value of a1 must exist in B or in C (never in both simultaneously).
+RI-5 - All a1, f1, f2, and g1 in rAFG must be in rHrAFG.
+RI-6 - All F must be in rAFG.
+RI-7 - All H must be in rHrAFG.
 (...)
