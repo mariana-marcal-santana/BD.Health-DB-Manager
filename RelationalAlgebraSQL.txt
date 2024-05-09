@@ -2,8 +2,14 @@ Ex1:
 r  <-  ssn G count-distinct(especialidade)->num_especialidades ( consulta ⨝c.nif=m.nif  medico )
 r  ⨝  G max(num_especialidades) (r) 
 
-
-
 Ex2: Which is the medical specialty with more appointments? (???)
 
-Ex3: Please write an SQL query that identifies which patients have multiple appointments (more than one) scheduled for the same day. Bearing in mind that the database is structured across two tables: 'patient' (with two columns: Nº_SS and name) and 'appointment' (with two columns: Nº_SS and date).
+Ex3: Write an SQL query that identifies which patients have multiple appointments (more than one) scheduled for the same day. Bearing in mind that the database is structured across two tables: 'patient' (with two columns: Nº_SS and name) and 'appointment' (with two columns: Nº_SS and date).
+
+
+Ex4:
+proporçao mal calculada - não menciona especialidade (devia calcular a proporçao de fidelidade como n de consultas com o medico dividido pelo n total de consultas que o paciente fez da especialidade)
+SELECT MIN(periodo) é desnecessario a não ser que se considere q o paciente deve ser fiel ao primeiro medico a q foi da especialidade; msm assim como nao é mencionada a especialidade o codigo continua incorreto
+penultima linha -> GROUP by m.nome devia ser m.NIF porque pode haver nomes de medicos repetidos
+
+
