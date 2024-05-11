@@ -19,7 +19,7 @@ D(__a1__, __f1__, __f2__, __g1__, __h1__, __d1__)
   g1: FK(G)
   h1: FK(h)
 
-rCE(__a1__, __e1__, __e2__, rce1)
+rCE(__a1__, e1, e2, rce1)
   a1: FK(C)
   e1, e2: FK(E) NOT NULL, FK(E) NOT NULL
 
