@@ -21,11 +21,11 @@ D(__a1__, __f1__, __f2__, __g1__, __h1__, __d1__)
 
 rCE(__a1__, __e1__, __e2__, rce1)
   a1: FK(C)
-  e1, e2: FK(E), FK(E)
+  e1, e2: FK(E) NOT NULL, FK(E) NOT NULL
 
 rAFG(__a1__, __f1__, __f2__, __g1__,rHrAFG)
   a1: FK(A)
-  f1, f2: FK(F), FK(F) NOT NULL
+  f1, f2: FK(F) NOT NULL, FK(F) NOT NULL
   g1: FK(G)
   rHrAFG :                         
     h1: FK(H) NOT NULL
@@ -35,5 +35,3 @@ RI-2 - Any h1 in H must exist in rHrAFG.
 RI-3 - Any pair f1, f2 in F must exist in rAFG.
 RI-4 - Each value of a1 must exist in B or in C (never in both simultaneously).
 RI-5 - All a1, f1, f2, and g1 in rAFG must be in rHrAFG.
-RI-6 - All F must be in rAFG.
-RI-7 - All H must be in rHrAFG.
