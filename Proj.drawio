@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-05-12T21:44:19.626Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" etag="yqgz90o65L30ylY46XoR" version="24.4.0" type="github">
+<mxfile host="app.diagrams.net" modified="2024-05-12T22:16:37.424Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" etag="AXtyhd-OujaTD1olXQcK" version="24.4.0" type="github">
   <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-    <mxGraphModel dx="1150" dy="1080" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
+    <mxGraphModel dx="118" dy="508" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2336" pageHeight="1654" math="0" shadow="0">
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
@@ -314,46 +314,46 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-37" value="Prescription" style="whiteSpace=wrap;html=1;align=center;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1659" y="895" width="100" height="40" as="geometry" />
+          <mxGeometry x="1691" y="895" width="100" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="B4XKHxUm8b0waW_bjwol-38" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-37" target="B4XKHxUm8b0waW_bjwol-23" edge="1">
+        <mxCell id="B4XKHxUm8b0waW_bjwol-38" value="" style="endArrow=none;html=1;rounded=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-37" target="B4XKHxUm8b0waW_bjwol-23" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1860" y="880" as="sourcePoint" />
-            <mxPoint x="2020" y="880" as="targetPoint" />
+            <mxPoint x="1892" y="880" as="sourcePoint" />
+            <mxPoint x="1822" y="790" as="targetPoint" />
             <Array as="points" />
           </mxGeometry>
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-39" value="SNS Code" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1597" y="816" width="100" height="42" as="geometry" />
+          <mxGeometry x="1629" y="816" width="100" height="42" as="geometry" />
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-40" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-39" target="B4XKHxUm8b0waW_bjwol-37" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1929" y="1050" as="sourcePoint" />
-            <mxPoint x="2089" y="1050" as="targetPoint" />
+            <mxPoint x="1961" y="1050" as="sourcePoint" />
+            <mxPoint x="2121" y="1050" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-42" value="" style="shape=rhombus;html=1;dashed=0;whiteSpace=wrap;perimeter=rhombusPerimeter;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1679" y="967" width="60" height="50" as="geometry" />
+          <mxGeometry x="1711" y="967" width="60" height="50" as="geometry" />
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-43" value="" style="endArrow=none;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-42" target="B4XKHxUm8b0waW_bjwol-44" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1749" y="980" as="sourcePoint" />
-            <mxPoint x="1709" y="1060" as="targetPoint" />
+            <mxPoint x="1781" y="980" as="sourcePoint" />
+            <mxPoint x="1741" y="1060" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-44" value="Medicine" style="whiteSpace=wrap;html=1;align=center;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1659" y="1093" width="100" height="40" as="geometry" />
+          <mxGeometry x="1691" y="1093" width="100" height="40" as="geometry" />
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-45" value="&amp;nbsp;&amp;lt; contains" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=270;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1627" y="979" width="70" height="30" as="geometry" />
+          <mxGeometry x="1659" y="979" width="70" height="30" as="geometry" />
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-46" value="Amount" style="ellipse;whiteSpace=wrap;html=1;align=center;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1769" y="972" width="100" height="40" as="geometry" />
+          <mxGeometry x="1792" y="972" width="100" height="40" as="geometry" />
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-47" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-42" target="B4XKHxUm8b0waW_bjwol-46" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1739" y="1030" as="sourcePoint" />
-            <mxPoint x="1899" y="1030" as="targetPoint" />
+            <mxPoint x="1771" y="1030" as="sourcePoint" />
+            <mxPoint x="1931" y="1030" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="B4XKHxUm8b0waW_bjwol-48" value="medical appointment" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
@@ -447,21 +447,21 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="jm6a07xHTlRLZ0ycuueC-0" value="&lt;div style=&quot;text-align: left; font-size: 16px;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;br&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 16px;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;Restrições de Integridade:&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;font-size: 16px;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;RI - 1: Médicos têm uma especialidade&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;reconhecida pela ordem dos médicos;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;RI - 2: Médicos podem trabalhar em várias clínicas numa semana mas, em cada dia trabalham só numa;&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;RI - 3: As consultas só podem decorrer em dias úteis;&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;RI - 4: Cada consulta decorre num período de 30 minutos a partir de &quot;Start Hour&quot;&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;entre as 8:00 e as 20:00;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;RI - 5: Cada paciente e médico só pode ter uma marcação em cada período de tempo;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;RI - 6:&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;Sintomas&amp;nbsp;qualitativos têm um nome de&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;uma lista de vocabulário SNOMED CT;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 16px;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;RI - 7: M&lt;/span&gt;&lt;span style=&quot;background-color: initial; text-align: center;&quot;&gt;edicamentos são escolhidos a partir de uma lista do Infarmed;&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 16px;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;RI - 8: O Telephone e a morada são únicos em Clinic;&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 16px;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;RI - 9: O&amp;nbsp; NIF, o Telephone e o IBAN são únicos em Health Staff;&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 16px;&quot;&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot;&gt;RI - 10: O&amp;nbsp; NIF, o Telephone e o SNS number são únicos em Patient.&lt;/font&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1119" y="833" width="466" height="345" as="geometry" />
+          <mxGeometry x="1119" y="833" width="486" height="345" as="geometry" />
         </mxCell>
         <mxCell id="jm6a07xHTlRLZ0ycuueC-1" value="Medicine Name" style="ellipse;whiteSpace=wrap;html=1;align=center;fontStyle=4;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1570" y="1037" width="119" height="40" as="geometry" />
+          <mxGeometry x="1602" y="1037" width="119" height="40" as="geometry" />
         </mxCell>
         <mxCell id="jm6a07xHTlRLZ0ycuueC-2" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="jm6a07xHTlRLZ0ycuueC-1" target="B4XKHxUm8b0waW_bjwol-44" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1649" y="1020" as="sourcePoint" />
-            <mxPoint x="1809" y="1020" as="targetPoint" />
+            <mxPoint x="1681" y="1020" as="sourcePoint" />
+            <mxPoint x="1841" y="1020" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="CQiO0zF6Q8Tx_IdA4bHp-3" value="" style="shape=link;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="B4XKHxUm8b0waW_bjwol-37" target="B4XKHxUm8b0waW_bjwol-42" edge="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1589" y="980" as="sourcePoint" />
-            <mxPoint x="1749" y="980" as="targetPoint" />
+            <mxPoint x="1621" y="980" as="sourcePoint" />
+            <mxPoint x="1781" y="980" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="CQiO0zF6Q8Tx_IdA4bHp-4" value="" style="resizable=0;html=1;whiteSpace=wrap;align=right;verticalAlign=bottom;" parent="CQiO0zF6Q8Tx_IdA4bHp-3" connectable="0" vertex="1">
@@ -568,10 +568,10 @@
           <mxGeometry x="1867" y="1064" width="47" height="26" as="geometry" />
         </mxCell>
         <mxCell id="Vh36rG5NA8E54AXmx6I6-5" value="RI - 7" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1712" y="1065" width="47" height="26" as="geometry" />
+          <mxGeometry x="1744" y="1065" width="47" height="26" as="geometry" />
         </mxCell>
         <mxCell id="_BqhS-hAI8EpcfWpUssP-0" value="RI - 9" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-          <mxGeometry x="1770" y="900" width="50" height="30" as="geometry" />
+          <mxGeometry x="1802" y="900" width="50" height="30" as="geometry" />
         </mxCell>
         <mxCell id="_BqhS-hAI8EpcfWpUssP-1" value="&lt;div&gt;RI - 8&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
           <mxGeometry x="1164" y="530" width="47" height="26" as="geometry" />
