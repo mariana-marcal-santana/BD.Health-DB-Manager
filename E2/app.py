@@ -87,6 +87,19 @@ def clinics_doctors_slots(clinica, especialidade):
 
     return jsonify(doctors)
 
+@app.route("/a/<clinica>/registar/", methods=("POST",))
+def register_appointment(clinica):
+    """Registers an appointment in a clinic"""
+
+    return jsonify({"status": "success"})
+
+
+@app.route("/a/<clinica>/cancelar/", methods=("POST",))
+def cancel_appointment(clinica):
+    """Cancels an appointment in a clinic"""
+
+    return jsonify({"status": "success"})
+
 
 if __name__ == "__main__":
     app.run()
