@@ -544,7 +544,7 @@ BEGIN
                     SELECT parametro 
                     FROM (
                         VALUES 
-                        ('Dor de cabeça'), ('Náusea'), ('Vômito'), ('Febre'), ('Tosse'),
+                        ('Dor de cabeça'), ('Náusea'), ('Vómito'), ('Febre'), ('Tosse'),
                         ('Fadiga'), ('Falta de ar'), ('Tontura'), ('Perda de apetite'), ('Dor abdominal'),
                         ('Diarreia'), ('Constipação'), ('Dor no peito'), ('Dor nas articulações'), ('Dor muscular'),
                         ('Arrepios'), ('Suores noturnos'), ('Palpitações'), ('Confusão mental'), ('Visão turva'),
