@@ -617,9 +617,50 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION inserir_horario_disponivel() RETURNS VOID AS $$
+DECLARE
+    medico_nif CHAR(9);
+    clinica_nome VARCHAR(80);
+    especialidade_nome VARCHAR(80);
+BEGIN
+    FOR medico_nif, clinica_nome, especialidade_nome IN
+        SELECT medico.nif, clinica.nome, medico.especialidade
+        FROM medico
+        JOIN trabalha ON medico.nif = trabalha.nif
+        JOIN clinica ON trabalha.nome = clinica.nome
+    LOOP
+        INSERT INTO horario_disponivel (nif, dia_da_semana, data, hora, nome, especialidade)
+        SELECT 
+            medico_nif, 
+            EXTRACT(DOW FROM datas.data), 
+            datas.data, 
+            horas.hora, 
+            clinica_nome, 
+            especialidade_nome
+        FROM 
+            (SELECT generate_series('2024-01-01'::date, '2024-12-31'::date, '1 day'::interval)::date AS data) AS datas,
+            (SELECT ('08:00:00'::time + generate_series(0, (5 * 60 / 30) - 1) * '30 minutes'::interval)::time AS hora
+             UNION ALL
+             SELECT ('14:00:00'::time + generate_series(0, (5 * 60 / 30) - 1) * '30 minutes'::interval)::time AS hora) AS horas
+        WHERE 
+            EXTRACT(DOW FROM datas.data) BETWEEN 0 AND 6 AND
+            NOT EXISTS (
+                SELECT 1
+                FROM consulta
+                WHERE consulta.nif = medico_nif AND
+                      consulta.data = datas.data AND
+                      consulta.hora = horas.hora AND
+                      consulta.nome = clinica_nome
+            );
+        ON CONFLICT (nif, dia_da_semana, data, hora) DO NOTHING;
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
 SELECT inserir_trabalha();
 SELECT inserir_pacientes();
 SELECT inserir_consultas_auxiliares();
 SELECT inserir_consultas();
 SELECT inserir_receitas();
 SELECT inserir_observacoes();
+SELECT inserir_horario_disponivel();    
