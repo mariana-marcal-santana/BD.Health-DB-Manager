@@ -4,6 +4,7 @@ from logging.config import dictConfig
 import psycopg
 from flask import Flask, jsonify, request
 from psycopg.rows import namedtuple_row
+from datetime import date, time
 
 # Use the DATABASE_URL environment variable if it exists, otherwise use the default.
 # Use the format postgres://username:password@hostname/database_name to connect to the database.
@@ -91,15 +92,74 @@ def clinics_doctors_slots(clinica, especialidade):
 def register_appointment(clinica):
     """Registers an appointment in a clinic"""
 
-    return jsonify({"status": "success"})
+    ssn = request.args.get("ssn")
+    nif = request.args.get("nif")
+    data = request.args.get("data")
+    hora = request.args.get("hora")
+
+    error = None
+
+    if not ssn or not nif or not data or not hora:
+        error = "Args missing."
+
+    data_now = date.now()
+    hora_now = time.now()
+
+    if data_now > data or (data_now == data and hora_now > hora):
+        error = "Invalid date or time."
+
+    if error is not None:
+        return error, 400
+    
+    else:
+        with psycopg.connect(conninfo=DATABASE_URL) as conn:
+            with conn.cursor(row_factory=namedtuple_row) as cur:
+                cur.execute(
+                    """
+                    INSERT INTO consulta (nif, ssn, data, hora, clinica)
+                    VALUES (%(nif)s, %(ssn)s, %(clinica)s, %(data)s, %(hora)s);
+                    """,
+                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+                )
+            conn.commit()
+        return "", 204
 
 
 @app.route("/a/<clinica>/cancelar/", methods=("POST",))
 def cancel_appointment(clinica):
     """Cancels an appointment in a clinic"""
 
-    return jsonify({"status": "success"})
+    ssn = request.args.get("ssn")
+    nif = request.args.get("nif")
+    data = request.args.get("data")
+    hora = request.args.get("hora")
 
+    error = None
+
+    if not ssn or not nif or not data or not hora:
+        error = "Args missing."
+
+    data_now = date.now()
+    hora_now = time.now()
+
+    if data_now > data or (data_now == data and hora_now > hora):
+        error = "Invalid date or time."
+
+    if error is not None:
+        return error, 400
+    
+    else:
+        with psycopg.connect(conninfo=DATABASE_URL) as conn:
+            with conn.cursor(row_factory=namedtuple_row) as cur:
+                cur.execute(
+                    """
+                    DELETE FROM consulta
+                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND clinica = %(clinica)s;
+                    """,
+                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+                )
+            conn.commit()
+        return "", 204
 
 if __name__ == "__main__":
     app.run()
