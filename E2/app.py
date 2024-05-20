@@ -122,7 +122,7 @@ def register_appointment(clinica):
                     {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
                 )
             conn.commit()
-        return "", 204
+        return jsonify({"message": "Appointment registered successfully"}), 200
 
 
 @app.route("/a/<clinica>/cancelar/", methods=("POST",))
@@ -159,7 +159,7 @@ def cancel_appointment(clinica):
                     {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
                 )
             conn.commit()
-        return "", 204
+        return jsonify({"message": "Appointment canceled successfully"}), 200
 
 if __name__ == "__main__":
     app.run()
