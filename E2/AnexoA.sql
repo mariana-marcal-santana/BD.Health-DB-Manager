@@ -402,8 +402,9 @@ BEGIN
                 INSERT INTO consulta_auxiliar (ssn, data, hora) VALUES (ssn_paciente, data_consulta, hora_consulta) RETURNING id INTO consulta_id;
 
                 -- Atualizar código_sns com base no id gerado
-                UPDATE consulta_auxiliar SET codigo_sns = LPAD(consulta_id::text, 12, '0') WHERE id = consulta_id;
-                
+                IF random() < 0.8 THEN
+                    UPDATE consulta_auxiliar SET codigo_sns = LPAD(consulta_id::text, 12, '0') WHERE id = consulta_id;
+                END IF;
                 -- Sair do loop de tentativa
                 EXIT;
             END IF;
@@ -494,11 +495,8 @@ BEGIN
     -- Obter o número total de consultas
     SELECT COUNT(*) INTO total_consultas FROM consulta;
 
-    -- Calcular o número de consultas que devem ter receitas (80% do total)
-    consultas_com_receita := total_consultas * 0.8;
-
     -- Para cada consulta na tabela consulta
-    FOR consulta IN SELECT * FROM consulta ORDER BY random() LIMIT consultas_com_receita LOOP
+    FOR consulta IN SELECT * FROM consulta WHERE codigo_sns IS NOT NULL ORDER BY random() LIMIT consultas_com_receita LOOP
         -- Selecionar aleatoriamente entre 1 e 6 medicamentos
         num_medicamentos := floor(random() * 6) + 1;
 
