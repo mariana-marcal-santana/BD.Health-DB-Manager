@@ -270,7 +270,7 @@ DECLARE
     clinica_nome VARCHAR(80);
     dia_semana INTEGER;
 BEGIN
-    -- Atribuir cada médico a duas clínicas aleatórias
+    -- Atribuir cada médico a duas clínicas aleatórias, garantindo que não estejam alocados a mais de uma clínica no mesmo dia
     FOR medico_nif IN (SELECT nif FROM medico) LOOP
         FOR clinica_nome IN (
             SELECT nome
@@ -279,8 +279,15 @@ BEGIN
             LIMIT 2
         ) LOOP
             FOR dia_semana IN 0..6 LOOP
-                INSERT INTO trabalha (nif, nome, dia_da_semana)
-                VALUES (medico_nif, clinica_nome, dia_semana);
+                -- Verificar se o médico já está alocado a uma clínica nesse dia
+                IF NOT EXISTS (
+                    SELECT 1
+                    FROM trabalha
+                    WHERE nif = medico_nif AND dia_da_semana = dia_semana
+                ) THEN
+                    INSERT INTO trabalha (nif, nome, dia_da_semana)
+                    VALUES (medico_nif, clinica_nome, dia_semana);
+                END IF;
             END LOOP;
         END LOOP;
     END LOOP;
@@ -289,14 +296,14 @@ BEGIN
     FOR clinica_nome IN (SELECT nome FROM clinica) LOOP
         -- Loop para cada dia da semana
         FOR dia_semana IN 0..6 LOOP
-            -- Selecionar aleatoriamente 8 médicos que ainda não estão trabalhando nesta clínica neste dia
+            -- Selecionar aleatoriamente 8 médicos que ainda não estão trabalhando nesta clínica neste dia e não estão alocados a outra clínica neste dia
             FOR medico_nif IN (
                 SELECT nif 
                 FROM medico 
                 WHERE nif NOT IN (
                     SELECT nif 
                     FROM trabalha 
-                    WHERE nome = clinica_nome AND dia_da_semana = dia_semana
+                    WHERE dia_da_semana = dia_semana
                 )
                 ORDER BY RANDOM() 
                 LIMIT 8
