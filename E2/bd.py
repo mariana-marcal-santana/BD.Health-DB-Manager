@@ -337,15 +337,28 @@ def gerar_consultas(data_inicio, data_fim):
     global clinicas
     global trabalha
     
-    id_consulta = 1;
+    id_consulta = 1
     for paciente in pacientes :
 
         ssn = paciente['ssn']
-               
+        data_consulta = random_date(data_inicio, data_fim)
+        hora_consulta = random_time_restrict()
+        data_consulta = datetime.strptime(data_consulta, "%Y-%m-%d")
+        # Obter médico aleatório
+        medico = random.choice(medicos)
+        nome_clinica = get_clinica(medico['nif'], data_consulta.weekday())
+       
+        while medico_tem_consulta_no_horario(medico, data_consulta, hora_consulta):
+            hora_consulta = random_time_restrict()
+           
         # Criar consulta com os dados gerados
         consulta = {
             "id": id_consulta,
             "ssn": ssn, 
+            "nif": medico['nif'],
+            "nome_clinica": nome_clinica,
+            "data": data_consulta,
+            "hora": hora_consulta,
             "codigo_sns": None
         }
         id_consulta += 1
@@ -353,43 +366,55 @@ def gerar_consultas(data_inicio, data_fim):
         consultas.append(consulta)
 
     for day in range((data_fim - data_inicio).days + 1):
-        data_consulta = (data_inicio + timedelta(days=day)).date()
-        dia_semana = data_consulta.weekday()
-        index_clinica = 0
-        index_consulta = 0
-        while True:
-            
-            if index_clinica == len(clinicas):
-                break
-            clinica = clinicas[index_clinica]
-            
-            i = 0 
-            while i <= 20 :
-                i += 1
+        
+        data = data_inicio + timedelta(days=day)
+        
+        for clinica in clinicas:
+            for i in range(1,20):
+                medicos_clinica = get_medicos_clinica(data,clinica)
+                medico = random.choice(medicos_clinica)
+                ssn = random.choice(pacientes)['ssn']
                 hora_consulta = random_time_restrict()
-                consulta[index_consulta] = {
-                    "clinica": clinica,
-                    "data": data_consulta,
-                    "hora": hora_consulta
+                while medico_tem_consulta_no_horario(medico, data, hora_consulta) or\
+                    paciente_tem_consulta_no_horario(paciente, data, hora_consulta):
+                    hora_consulta = random_time_restrict()
+                consulta = {
+                    "id": id_consulta,
+                    "ssn": ssn,
+                    "nif": medico['nif'],
+                    "nome_clinica": clinica['nome'],
+                    "data": data,
+                    "hora": hora_consulta,
+                    "codigo_sns": None
                 }
-                index_consulta += 1
-            
-            index_clinica += 1
-          
-            
+                id_consulta += 1
+                consultas.append(consulta)
+
+        for medico in medicos:
+            for i in range(1, 2):
+
+                clinica = random.choice(clinicas)['nome']
+                ssn = random.choice(pacientes)['ssn']
+                hora_consulta = random_time_restrict()
+
+                while medico_tem_consulta_no_horario(medico, data, hora_consulta) or\
+                    paciente_tem_consulta_no_horario(paciente, data, hora_consulta):
+                    hora_consulta = random_time_restrict()
+                consulta = {
+                    "id": id_consulta,
+                    "ssn": ssn,
+                    "nif": medico['nif'],
+                    "nome_clinica": clinica,
+                    "data": data,
+                    "hora": hora_consulta,
+                    "codigo_sns": None
+                }
+                id_consulta += 1
+                consultas.append(consulta)
+        
+    return consultas
 
 
-    
-    
-    # Adicionar consultas com código SNS
-
-    numero_consultas = len(consultas)
-    numero_consultas_com_codigo_sns = int(numero_consultas * 0.8)
-    for i in range(numero_consultas_com_codigo_sns):
-        consulta = consultas[i]
-        codigo_sns = generate_codigo_sns()
-        consultas[i]['codigo_sns'] = codigo_sns
-    return consultas    
 
 def paciente_tem_consulta_no_horario(paciente, data_consulta, hora_consulta):
     global consultas
@@ -398,6 +423,7 @@ def paciente_tem_consulta_no_horario(paciente, data_consulta, hora_consulta):
             return True
     return False
 
+
 def medico_tem_consulta_no_horario(medico, data_consulta, hora_consulta):
     global consultas
     for consulta in consultas:
@@ -405,13 +431,11 @@ def medico_tem_consulta_no_horario(medico, data_consulta, hora_consulta):
             return True
     return False
 
-def escolhe_clinica(nif_medico, dia_semana):
+def get_clinica(nif_medico, dia_semana):
     global trabalha
-    clinicas_medico = []
     for item in trabalha:
         if item['nif'] == nif_medico and item['dia_da_semana'] == dia_semana:
-            clinicas_medico.append(item['nome'])
-    return random.choice(clinicas_medico)
+            return item['nome']
 
 def random_date(start, end):
     # Gerar uma data aleatória dentro do intervalo especificado
@@ -424,16 +448,17 @@ def random_date(start, end):
 
 def random_time_restrict():
     # Gerar uma hora aleatória entre 8:00 e 18:30, exceto entre 13:00 e 14:00
-    while True:
+    hora = random.randint(8, 19)  
+    minutos = random.choice([0, 30]) 
+    while hora == 13 and minutos == 30:
         hora = random.randint(8, 19)  
-        minutos = random.choice([0, 30])  
-        while hora >= 13 and hora < 14:
-            hora = random.randint(8, 19)
-        hora_consulta = '{:02d}:{:02d}:00'.format(hora, minutos)
-        # Verificar se a hora está dentro do intervalo permitido
-        return hora_consulta
+        minutos = random.choice([0, 30]) 
+
+    hora_consulta = '{:02d}:{:02d}:00'.format(hora, minutos)
+    # Verificar se a hora está dentro do intervalo permitido
+    return hora_consulta
     
-def get_random_medico_clinica(data, clinica):
+def get_medicos_clinica(data, clinica):
     global medicos
     medicos_clinica = []
     for item in trabalha:
@@ -441,10 +466,7 @@ def get_random_medico_clinica(data, clinica):
             for medico in medicos:
                 if medico['nif'] == item['nif']:
                     medicos_clinica.append(medico)
-    if medicos_clinica:
-        return random.choice(medicos_clinica)
-    else:
-        return None
+    return medicos_clinica
     
 def generate_codigo_sns():
     return ''.join([str(random.randint(0, 9)) for _ in range(12)])
