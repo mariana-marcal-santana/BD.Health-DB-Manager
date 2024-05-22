@@ -100,7 +100,7 @@ pacientes = []
 consultas = []
 receitas = []
 observacoes = []
-
+horarios_disponiveis = []
 
 def criar_clinicas(num_clinicas):
     global clinicas
@@ -393,8 +393,8 @@ def gerar_consultas(data_inicio, data_fim):
         for medico in medicos:
             for i in range(1, 2):
 
-                clinica = random.choice(clinicas)['nome']
-                ssn = random.choice(pacientes)['ssn']
+                clinica = get_clinica(medico['nif'], data.weekday())
+                paciente = random.choice(pacientes)
                 hora_consulta = random_time_restrict()
 
                 while medico_tem_consulta_no_horario(medico, data, hora_consulta) or\
@@ -598,3 +598,33 @@ def escrever_observacoes_em_sql(observacoes):
 # Uso das funções
 observacoes = gerar_observacoes()
 escrever_observacoes_em_sql(observacoes)
+
+
+
+
+def gerar_horarios_disponiveis():
+    global medicos
+    global clinicas
+    global horarios_disponiveis
+    global consultas
+
+    for day in range((data_fim - data_inicio).days + 1):
+        possivel_data = (data_inicio + timedelta(days=day)).date()
+        possivel_hora = datetime.time(8, 0)
+        for medico in medicos:
+            while medico_tem_consulta_no_horario(medico, possivel_data, possivel_hora):
+                possivel_hora = datetime.time(possivel_hora.hour, possivel_hora.minute + 30)
+            if possivel_hora == datetime.time(13, 30):
+                possivel_hora = datetime.time(14, 0)
+            elif possivel_hora > datetime.time(19, 0):
+                continue
+            clinica =  get_clinica(medico['nif'], possivel_data.weekday())
+            horarios_disponiveis.append({
+                "nif": medico['nif'],
+                "clinica": clinica['nome'],
+                "especialidade": medico['especialidade'],
+                "data": possivel_data,
+                "hora": possivel_hora
+            })
+            possivel_hora = datetime.time(possivel_hora.hour, possivel_hora.minute + 30)
+    return horarios_disponiveis
