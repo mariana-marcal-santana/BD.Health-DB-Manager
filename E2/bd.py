@@ -369,78 +369,21 @@ def gerar_consultas_pacientes(data_inicio, data_fim):
         id_consulta += 1
         consultas.append(consulta)
 
-# def gerar_consultas_medicos(data_inicio, data_fim):
-#     global consultas
-#     global medicos
-#     global pacientes
-#     global id_consulta  
-
-#     for day in range((data_fim - data_inicio).days + 1):
-#         data_consulta = (data_inicio + timedelta(days=day)).date()
-#         for medico in medicos:
-#             nome_clinica = get_clinica(medico['nif'], data_consulta.weekday())
-#             for i in range(2):
-#                 hora_consulta = random_time_restrict()
-#                 paciente = random.choice(pacientes)
-#                 data_consulta_str = data_consulta.strftime("%Y-%m-%d")
-
-#                 while paciente_tem_consulta_no_horario(paciente, data_consulta_str, hora_consulta)\
-#                         or medico_tem_consulta_no_horario(medico, data_consulta_str, hora_consulta):
-#                     hora_consulta = random_time_restrict()
-#                 consulta = {
-#                     "id": id_consulta,
-#                     "ssn": paciente['ssn'],
-#                     "nif": medico['nif'],
-#                     "nome_clinica": nome_clinica,
-#                     "data": data_consulta_str,
-#                     "hora": hora_consulta,
-#                     "codigo_sns": None
-#                 }
-#                 id_consulta += 1
-#                 consultas.append(consulta)
-
-def gerar_consultas_clinicas(data_inicio, data_fim):
+def gerar_consultas_medicos(data_inicio, data_fim):
     global consultas
-    global clinicas
-    global pacientes
     global medicos
-    global id_consulta
+    global pacientes
+    global id_consulta  
 
     for day in range((data_fim - data_inicio).days + 1):
-        
         data_consulta = (data_inicio + timedelta(days=day)).date()
-        data_consulta_str = data_consulta.strftime("%Y-%m-%d")
-
-        for clinica in clinicas:
-            nome_clinica = clinica['nome']
-            count_num_consultas = 0
-            medicos_clinica = get_medicos_clinica(data_consulta, clinica)
-            for medico in medicos_clinica:
-                for i in range(2):
-                    hora_consulta = random_time_restrict()
-                    paciente = random.choice(pacientes)
-
-                    while paciente_tem_consulta_no_horario(paciente, data_consulta_str, hora_consulta)\
-                            or medico_tem_consulta_no_horario(medico, data_consulta_str, hora_consulta):
-                        hora_consulta = random_time_restrict()
-                    consulta = {
-                        "id": id_consulta,
-                        "ssn": paciente['ssn'],
-                        "nif": medico['nif'],
-                        "nome_clinica": nome_clinica,
-                        "data": data_consulta_str,
-                        "hora": hora_consulta,
-                        "codigo_sns": None
-                    }
-                    id_consulta += 1
-                    count_num_consultas += 1
-                    consultas.append(consulta)
-
-            while count_num_consultas < 20 :
-                medico = random.choice(medicos_clinica)
+        for medico in medicos:
+            nome_clinica = get_clinica(medico['nif'], data_consulta.weekday())
+            for i in range(2):
                 hora_consulta = random_time_restrict()
                 paciente = random.choice(pacientes)
-        
+                data_consulta_str = data_consulta.strftime("%Y-%m-%d")
+
                 while paciente_tem_consulta_no_horario(paciente, data_consulta_str, hora_consulta)\
                         or medico_tem_consulta_no_horario(medico, data_consulta_str, hora_consulta):
                     hora_consulta = random_time_restrict()
@@ -454,14 +397,51 @@ def gerar_consultas_clinicas(data_inicio, data_fim):
                     "codigo_sns": None
                 }
                 id_consulta += 1
-                count_num_consultas += 1
                 consultas.append(consulta)
 
+def gerar_consultas_clinicas(data_inicio, data_fim):
+    global consultas
+    global clinicas
+    global pacientes
+    global medicos
+    global id_consulta
+
+    for day in range((data_fim - data_inicio).days + 1):
+
+        data_consulta = (data_inicio + timedelta(days=day)).date()
+        data_consulta_str = data_consulta.strftime("%Y-%m-%d")
+
+        for clinica in clinicas:
+            nome_clinica = clinica['nome']
+            medicos_clinica = get_medicos_clinica(data_consulta, clinica)
+
+            for i in range(20):
+                hora_consulta = random_time_restrict()
+                paciente = random.choice(pacientes)
+                medico = random.choice(medicos_clinica)
+                while paciente_tem_consulta_no_horario(paciente, data_consulta_str, hora_consulta) or \
+                    medico_tem_consulta_no_horario(medico, data_consulta_str, hora_consulta):
+                    hora_consulta = random_time_restrict()
+                consulta = {
+                    "id": id_consulta,
+                    "ssn": paciente['ssn'],
+                    "nif": medico['nif'],
+                    "nome_clinica": nome_clinica,
+                    "data": data_consulta_str,
+                    "hora": hora_consulta,
+                    "codigo_sns": None
+                }
+                id_consulta += 1
+                consultas.append(consulta)
             
 def gerar_consultas(data_inicio, data_fim):
+    print(1)
     gerar_consultas_pacientes(data_inicio, data_fim)
-    #gerar_consultas_medicos(data_inicio, data_fim)
+    print(2)
+    gerar_consultas_medicos(data_inicio, data_fim)
+    print(3)    
     gerar_consultas_clinicas(data_inicio, data_fim)
+    print(4)
    
 
 
