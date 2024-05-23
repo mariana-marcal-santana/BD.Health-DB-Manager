@@ -202,9 +202,11 @@ gerar_medicos()
 escrever_medicos_em_txt(medicos)
 
 def gerar_trabalha():
+   
     global trabalha
     global medicos
     # Atribuindo médicos a duas clínicas em dois dias da semana
+    
     for medico in medicos:
         duas_clinicas = random.sample(clinicas, 2)
         dias_semana = random.sample(range(7), 2)
@@ -226,13 +228,14 @@ def gerar_trabalha():
                     print(f"Nenhum médico disponível em {dia_semana} para a clínica {clinica['nome']}")
                     continue
                 medico = random.choice(medicos_livres_)
-                while medico_trabalha_no_dia(medico, dia_semana):
-                    medico = random.choice(medicos_livres_)
                 trabalha.append({
                     "nif": medico['nif'],
                     "nome": clinica['nome'],
                     "dia_da_semana": dia_semana
                 })
+                for medico in medicos_livres_:
+                    medicos_livres_.remove(medico)
+                
 
 def medico_trabalha_no_dia(medico, dia_semana):
     global trabalha
