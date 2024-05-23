@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 # Definir datas de início e fim
 data_inicio = datetime(2023, 12, 1)
-data_fim = datetime(2024, 1, 31)
+data_fim = datetime(2024, 1, 1)
 
 ruas_lisboa = [
     "Rua Augusta", "Avenida da Liberdade", "Rua do Ouro", "Rua da Prata", 
@@ -366,6 +366,7 @@ def gerar_consultas_pacientes(data_inicio, data_fim):
         medico = random.choice(medicos_clinica)
 
         while medico_tem_consulta_no_horario(medico, data_consulta_str, hora_consulta):
+            medico = random.choice(medicos_clinica)
             hora_consulta = random_time_restrict()
 
         # Criar consulta com os dados gerados
@@ -436,6 +437,7 @@ def gerar_consultas_clinicas(data_inicio, data_fim):
                 medico = random.choice(medicos_clinica)
                 while paciente_tem_consulta_no_horario(paciente, data_consulta_str, hora_consulta) or \
                     medico_tem_consulta_no_horario(medico, data_consulta_str, hora_consulta):
+                    medico = random.choice(medicos_clinica)
                     hora_consulta = random_time_restrict()
                 consulta = {
                     "id": id_consulta,
@@ -453,11 +455,17 @@ def gerar_consultas(data_inicio, data_fim):
     print(1)
     gerar_consultas_pacientes(data_inicio, data_fim)
     print(2)
-    #gerar_consultas_medicos(data_inicio, data_fim)
+    gerar_consultas_medicos(data_inicio, data_fim)
     print(3)    
-    #gerar_consultas_clinicas(data_inicio, data_fim)
+    gerar_consultas_clinicas(data_inicio, data_fim)
     print(4)
-   
+    
+    tamanho = int (len(consultas) *0.8)
+    for i in range(tamanho):
+        consulta = consultas[i]
+        if consulta['codigo_sns'] is None:
+            consulta['codigo_sns'] = generate_codigo_sns()  
+
 
 
 def paciente_tem_consulta_no_horario(paciente, data_consulta, hora_consulta):
@@ -544,15 +552,14 @@ def gerar_receitas():
     for consulta in consultas:
         if consulta['codigo_sns'] is not None:
             numero_medicamentos = random.randint(1, 6)
-            for i in range(numero_medicamentos):
-                medicamento = random.choice(medicamentos)
+            medicamentos_escolhidos = random.sample(medicamentos, numero_medicamentos)
+            for medicamento in medicamentos_escolhidos:
                 quantidade = random.randint(1, 3)
                 receitas.append({
                     "codigo_sns": consulta['codigo_sns'],
                     "medicamento": medicamento,
                     "quantidade": quantidade
                 })
-
 
 
 def escrever_receitas_em_sql(receitas):
@@ -601,20 +608,20 @@ def gerar_observacoes():
     global observacoes
     for consulta in consultas:
         numero_sintomas = random.randint(1, 5)
-        for i in range(numero_sintomas):
-            sintoma = random.choice(sintomas)
+        sintomas_escolhidos = random.sample(sintomas, numero_sintomas)
+        for sintoma in sintomas_escolhidos:
             observacoes.append({
                 "id": consulta['id'],
                 "sintoma": sintoma,
-                "valor" : None
+                "valor": None
             })
         numero_metricas = random.randint(0, 3)
-        for i in range(numero_metricas):
-            medicao = random.choice(medicoes)
+        metricas_escolhidas = random.sample(medicoes, numero_metricas)
+        for metrica in metricas_escolhidas:
             valor = random.uniform(0, 100)
             observacoes.append({
                 "id": consulta['id'],
-                "medicao": medicao,
+                "medicao": metrica,
                 "valor": valor
             })
 
