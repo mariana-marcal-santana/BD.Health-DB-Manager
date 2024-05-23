@@ -260,7 +260,13 @@ def escrever_trabalha_em_txt():
         file.write("-- Inserir Trabalha\n")
         file.write("INSERT INTO trabalha (nif, nome, dia_da_semana) VALUES\n")
         for entry in trabalha[:-1]:
-            linha = f"('{entry['nif']}', '{entry['nome']}', {entry['dia_da_semana']}),\n"
+            x = entry['dia_da_semana']
+            if x == 6:
+                x = 0
+            else:
+                x += 1
+            
+            linha = f"('{entry['nif']}', '{entry['nome']}', {x}),\n"
             file.write(linha)
         entry = trabalha[-1]
         linha = f"('{entry['nif']}', '{entry['nome']}', {entry['dia_da_semana']});\n"
@@ -348,16 +354,19 @@ def gerar_consultas_pacientes(data_inicio, data_fim):
     for paciente in pacientes :
 
         ssn = paciente['ssn']
-        data_consulta = random_date(data_inicio, data_fim)
+        
+        data_consulta_str = random_date(data_inicio, data_fim)
+        dia_semana = datetime.strptime(data_consulta_str, "%Y-%m-%d").weekday()
         hora_consulta = random_time_restrict()
-        data_consulta = datetime.strptime(data_consulta, "%Y-%m-%d")
-        # Obter médico aleatório
-        medico = random.choice(medicos)
-        nome_clinica = get_clinica(medico['nif'], data_consulta.weekday())
-        data_consulta_str = data_consulta.strftime("%Y-%m-%d")
+
+        clinica = random.choice(clinicas)
+        nome_clinica = clinica['nome']
+        medicos_clinica = get_medicos_clinica(dia_semana, clinica)
+        medico = random.choice(medicos_clinica)
+
         while medico_tem_consulta_no_horario(medico, data_consulta_str, hora_consulta):
             hora_consulta = random_time_restrict()
-           
+
         # Criar consulta com os dados gerados
         consulta = {
             "id": id_consulta,
@@ -382,6 +391,8 @@ def gerar_consultas_medicos(data_inicio, data_fim):
         data_consulta = (data_inicio + timedelta(days=day)).date()
         for medico in medicos:
             nome_clinica = get_clinica(medico['nif'], data_consulta.weekday())
+            if nome_clinica is None:
+                continue
             for i in range(2):
                 hora_consulta = random_time_restrict()
                 paciente = random.choice(pacientes)
@@ -416,7 +427,7 @@ def gerar_consultas_clinicas(data_inicio, data_fim):
 
         for clinica in clinicas:
             nome_clinica = clinica['nome']
-            medicos_clinica = get_medicos_clinica(data_consulta, clinica)
+            medicos_clinica = get_medicos_clinica(data_consulta.weekday(), clinica)
 
             for i in range(20):
                 hora_consulta = random_time_restrict()
@@ -441,9 +452,9 @@ def gerar_consultas(data_inicio, data_fim):
     print(1)
     gerar_consultas_pacientes(data_inicio, data_fim)
     print(2)
-    gerar_consultas_medicos(data_inicio, data_fim)
+    #gerar_consultas_medicos(data_inicio, data_fim)
     print(3)    
-    gerar_consultas_clinicas(data_inicio, data_fim)
+    #gerar_consultas_clinicas(data_inicio, data_fim)
     print(4)
    
 
@@ -489,10 +500,9 @@ def random_time_restrict():
     # Verificar se a hora está dentro do intervalo permitido
     return hora_consulta
     
-def get_medicos_clinica(data, clinica):
+def get_medicos_clinica(dia_semana, clinica):
     global medicos
     medicos_clinica = []
-    dia_semana = data.weekday()
     for item in trabalha:
         if item['nome'] == clinica['nome'] and item['dia_da_semana'] == dia_semana:
             for medico in medicos:

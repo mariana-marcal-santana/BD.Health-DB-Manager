@@ -94,7 +94,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF (EXTRACT(MINUTE FROM NEW.hora) NOT IN (0, 30)) OR 
        (EXTRACT(HOUR FROM NEW.hora) NOT BETWEEN 8 AND 19) OR 
-       (EXTRACT(HOUR FROM NEW.hora) = 13) THEN
+        ((EXTRACT(HOUR FROM NEW.hora) = 13) AND (EXTRACT(MINUTE FROM NEW.hora) = 30)) THEN
         RAISE EXCEPTION 'Horário de consulta inválido. Deve ser à hora exata ou meia-hora no horário 8-13h e 14-19h';
     END IF;
     RETURN NEW;
@@ -128,21 +128,28 @@ CREATE TRIGGER medico_paciente_trigger
 BEFORE INSERT OR UPDATE ON consulta
 FOR EACH ROW EXECUTE FUNCTION check_medico_paciente();
 
-
 CREATE OR REPLACE FUNCTION check_medico_clinica_dia()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NOT EXISTS (
+    IF EXISTS (
         SELECT 1 FROM trabalha 
         WHERE nif = NEW.nif AND 
               nome = NEW.nome AND 
               dia_da_semana = EXTRACT(DOW FROM NEW.data)
     ) THEN
+        -- O médico está programado para trabalhar nesta clínica neste dia da semana
+        RETURN NEW;
+    ELSE
+        -- O médico não está programado para trabalhar nesta clínica neste dia da semana
+        RAISE NOTICE 'Tentativa de inserção: nif=%', NEW.nif;
+        RAISE NOTICE 'Tentativa de inserção: nome=%', NEW.nome;
+        RAISE NOTICE 'Tentativa de inserção: data=%', NEW.data;
+        RAISE NOTICE 'Tentativa de inserção: dia_da_semana=%', EXTRACT(DOW FROM NEW.data);
         RAISE EXCEPTION 'Um médico só pode dar consultas na clínica em que trabalha no dia da semana correspondente à data da consulta';
     END IF;
-    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE TRIGGER medico_clinica_dia_trigger
 BEFORE INSERT OR UPDATE ON consulta
@@ -151,6 +158,7 @@ FOR EACH ROW EXECUTE FUNCTION check_medico_clinica_dia();
 ----------------------------------------
 -- Injections
 ----------------------------------------
+
 -- Inserir Clínicas
 INSERT INTO clinica (nome, telefone, morada) VALUES
 ('Clinica Lisboa A', '210000001', 'Rua A, 1000-100 Lisboa'),
