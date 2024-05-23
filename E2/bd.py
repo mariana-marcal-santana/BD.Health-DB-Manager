@@ -1,9 +1,6 @@
-
-import random
 import random
 from datetime import datetime, timedelta
 
-# Definir datas de início e fim
 data_inicio = datetime(2023, 12, 1)
 data_fim = datetime(2024, 1, 1)
 
@@ -96,17 +93,100 @@ medicamentos = [
     "Famotidina (Pepcid)"
 ]
 
-clinicas = []
-enfermeiros = []
-medicos = []
-trabalha = []
-pacientes = []
-consultas = []
-receitas = []
-observacoes = []
-horarios_disponiveis = []
+sintomas = [
+    'Dor de cabeça', 'Náusea', 'Vómito', 'Febre', 'Tosse',
+    'Fadiga', 'Falta de ar', 'Tontura', 'Perda de apetite', 'Dor abdominal',
+    'Diarreia', 'Constipação', 'Dor no peito', 'Dor nas articulações', 'Dor muscular',
+    'Arrepios', 'Suores noturnos', 'Palpitações', 'Confusão mental', 'Visão turva',
+    'Zumbido nos ouvidos', 'Formigamento', 'Comichão', 'Erupção cutânea', 'Inchaço',
+    'Icterícia', 'Tosse com sangue', 'Dificuldade para engolir', 'Rigidez matinal',
+    'Perda de peso inexplicável', 'Incontinência urinária', 'Urgência urinária', 'Dores de garganta',
+    'Rouquidão', 'Sonolência', 'Alterações de humor', 'Depressão', 'Ansiedade',
+    'Insônia', 'Pesadelos', 'Paralisia', 'Espasmos musculares', 'Fraqueza',
+    'Tremores', 'Sensação de desmaio', 'Desmaios', 'Dor na lombar', 'Dor de dentes',
+    'Queimação ao urinar', 'Alterações no paladar'
+]
 
-def criar_clinicas(num_clinicas):
+medicoes = [
+    'Temperatura corporal', 'Frequência cardíaca', 'Pressão arterial sistólica', 'Pressão arterial diastólica', 'Saturação de oxigênio',
+    'Nível de glicose no sangue', 'Peso corporal', 'Altura', 'Índice de massa corporal', 'Taxa de respiração',
+    'Nível de colesterol total', 'Nível de HDL', 'Nível de LDL', 'Nível de triglicerídeos', 'Taxa de filtração glomerular',
+    'Volume urinário', 'Taxa de sedimentação de eritrócitos', 'Hemoglobina', 'Contagem de leucócitos'
+]
+
+clinicas, enfermeiros, medicos, trabalha, pacientes = [], [], [], [], []
+consultas, receitas, observacoes, horarios_disponiveis = [], [], [], []
+
+# Funções auxiliares à geração de dados
+def paciente_tem_consulta_no_horario(paciente, data_consulta, hora_consulta):
+    global consultas
+    for consulta in consultas:
+        if consulta['ssn'] == paciente['ssn'] and consulta['data'] == data_consulta and consulta['hora'] == hora_consulta:
+            return True
+    return False
+
+def medico_tem_consulta_no_horario(medico, data_consulta, hora_consulta):
+    global consultas
+    for consulta in consultas:
+        if consulta['nif'] == medico['nif'] and consulta['data'] == data_consulta and consulta['hora'] == hora_consulta:
+            return True
+    return False
+
+def get_clinica(nif_medico, dia_semana):
+    global trabalha
+    for item in trabalha:
+        if item['nif'] == nif_medico and item['dia_da_semana'] == dia_semana:
+            return item['nome']
+
+def random_date(start, end):
+    # Gerar uma data aleatória dentro do intervalo especificado
+    start_timestamp = start.timestamp()
+    end_timestamp = end.timestamp()
+    random_timestamp = random.uniform(start_timestamp, end_timestamp)
+    random_date = datetime.fromtimestamp(random_timestamp)
+    random_date_str = random_date.strftime("%Y-%m-%d")
+    return random_date_str
+
+def random_time_restrict():
+    # Gerar uma hora aleatória entre 8:00 e 19:00, exceto entre 13:00 e 14:00
+    hora = random.randint(8, 19)  
+    minutos = random.choice([0, 30]) 
+    while hora == 13 and minutos == 30 or hora == 19 and minutos == 30:
+        hora = random.randint(8, 19)  
+        minutos = random.choice([0, 30]) 
+
+    hora_consulta = '{:02d}:{:02d}:00'.format(hora, minutos)
+    # Verificar se a hora está dentro do intervalo permitido
+    return hora_consulta
+    
+def get_medicos_clinica(dia_semana, clinica):
+    global medicos
+    medicos_clinica = []
+    for item in trabalha:
+        if item['nome'] == clinica['nome'] and item['dia_da_semana'] == dia_semana:
+            for medico in medicos:
+                if medico['nif'] == item['nif']:
+                    medicos_clinica.append(medico)
+    return medicos_clinica
+
+def medico_trabalha_no_dia(medico, dia_semana):
+    global trabalha
+    for item in trabalha:
+        if item['nif'] == medico['nif'] and item['dia_da_semana'] == dia_semana:
+            return True
+    return False
+
+def medicos_livres(dia_semana):
+    global medicos
+    global trabalha 
+    medicos_livres_ = []
+    for medico in medicos:
+        if not medico_trabalha_no_dia(medico, dia_semana):
+            medicos_livres_.append(medico)
+    return medicos_livres_
+
+# Funções de geração de dados
+def gerar_clinicas(num_clinicas):
     global clinicas
     ruas_lisboa = ["Rua A", "Rua B", "Rua C", "Rua D", "Rua E", "Rua F", "Rua G", "Rua H", "Rua I", "Rua J", "Rua K", "Rua L", "Rua M", "Rua N", "Rua O"]
     localidades = ["Lisboa", "Oeiras", "Cascais", "Sintra", "Amadora"]
@@ -117,27 +197,7 @@ def criar_clinicas(num_clinicas):
         morada = f"{random.choice(ruas_lisboa)}, 1000-{random.randint(100, 999)} {random.choice(localidades)}"
         clinicas.append({"nome": nome_clinica, "telefone": telefone, "morada": morada})
 
-def escrever_clinicas_em_txt(clinicas):
-    nome_arquivo = "populate1.sql"
-    with open(nome_arquivo, 'w') as file:
-        file.write("-- Inserir Clínicas\n")
-        file.write("INSERT INTO clinica (nome, telefone, morada) VALUES\n")
-        for clinica in clinicas[:-1]:
-            linha = f"('{clinica['nome']}', '{clinica['telefone']}', '{clinica['morada']}'),\n"
-            file.write(linha)
-        clinica = clinicas[-1]
-        linha = f"('{clinica['nome']}', '{clinica['telefone']}', '{clinica['morada']}');\n"
-        file.write(linha)
-    
-
-# Gerar dados das clínicas
-num_clinicas = 5
-criar_clinicas(num_clinicas)
-
-# Escrever os dados no arquivo .txt
-escrever_clinicas_em_txt(clinicas)
-
-def criar_enfermeiros(num_enfermeiros, clinicas):
+def gerar_enfermeiros(num_enfermeiros, clinicas):
     global enfermeiros
     for clinica in clinicas:
         nome_clinica = clinica['nome']
@@ -147,26 +207,6 @@ def criar_enfermeiros(num_enfermeiros, clinicas):
             telefone = "21" + "".join([str(random.randint(0, 9)) for _ in range(7)])
             morada = f"{random.choice(ruas_lisboa)}, 1000-{random.randint(100, 999)} Lisboa"
             enfermeiros.append({"nif": nif, "nome": nome_enfermeiro, "telefone": telefone, "morada": morada, "nome_clinica": nome_clinica})
-
-def escrever_enfermeiros_em_txt(enfermeiros):
-    nome_arquivo = "populate2.sql"
-    with open(nome_arquivo, 'w') as file:
-        file.write("-- Inserir Enfermeiros\n")
-        file.write("INSERT INTO enfermeiro (nif, nome, telefone, morada, nome_clinica) VALUES\n")
-        for enfermeiro in enfermeiros[:-1]:
-            linha = f"('{enfermeiro['nif']}', '{enfermeiro['nome']}', '{enfermeiro['telefone']}', '{enfermeiro['morada']}', '{enfermeiro['nome_clinica']}'),\n"
-            file.write(linha)
-        enfermeiro = enfermeiros[-1]
-        linha = f"('{enfermeiro['nif']}', '{enfermeiro['nome']}', '{enfermeiro['telefone']}', '{enfermeiro['morada']}', '{enfermeiro['nome_clinica']}');\n"
-        file.write(linha)
-
-
-# Gerar dados dos enfermeiros
-num_enfermeiros_por_clinica = 5
-criar_enfermeiros(num_enfermeiros_por_clinica, clinicas)
-# Escrever os dados no arquivo .txt
-escrever_enfermeiros_em_txt(enfermeiros)
-
 
 def gerar_medicos():
     global medicos
@@ -184,22 +224,6 @@ def gerar_medicos():
             "morada": morada,
             "especialidade": especialidade
         })
-
-def escrever_medicos_em_txt(medicos):
-    nome_arquivo = "populate3.sql"
-    with open(nome_arquivo, 'w') as file:
-        file.write("-- Inserir Médicos\n")
-        file.write("INSERT INTO medico (nif, nome, telefone, morada, especialidade) VALUES\n")
-        for medico in medicos[:-1]:
-            linha = f"('{medico['nif']}', '{medico['nome']}', '{medico['telefone']}', '{medico['morada']}', '{medico['especialidade']}'),\n"
-            file.write(linha)
-        medico = medicos[-1]
-        linha = f"('{medico['nif']}', '{medico['nome']}', '{medico['telefone']}', '{medico['morada']}', '{medico['especialidade']}');\n"
-        file.write(linha)
-
-# Uso das funções
-gerar_medicos()
-escrever_medicos_em_txt(medicos)
 
 def gerar_trabalha():
    
@@ -235,49 +259,7 @@ def gerar_trabalha():
                 })
                 for medico in medicos_livres_:
                     medicos_livres_.remove(medico)
-                
-
-def medico_trabalha_no_dia(medico, dia_semana):
-    global trabalha
-    for item in trabalha:
-        if item['nif'] == medico['nif'] and item['dia_da_semana'] == dia_semana:
-            return True
-    return False
-
-def medicos_livres(dia_semana):
-    global medicos
-    global trabalha 
-    medicos_livres_ = []
-    for medico in medicos:
-        if not medico_trabalha_no_dia(medico, dia_semana):
-            medicos_livres_.append(medico)
-    return medicos_livres_
-
-def escrever_trabalha_em_txt():
-    global trabalha
-    nome_arquivo = "populate4.sql"
-    with open(nome_arquivo, 'w') as file:
-        file.write("-- Inserir Trabalha\n")
-        file.write("INSERT INTO trabalha (nif, nome, dia_da_semana) VALUES\n")
-        for entry in trabalha[:-1]:
-            x = entry['dia_da_semana']
-            day = None
-            if x == 6:
-                day = 0
-            else:
-                day = x + 1
             
-            linha = f"('{entry['nif']}', '{entry['nome']}', {day}),\n"
-            file.write(linha)
-        entry = trabalha[-1]
-        linha = f"('{entry['nif']}', '{entry['nome']}', {day});\n"
-        file.write(linha)
-
-# Uso das funções
-gerar_trabalha()
-escrever_trabalha_em_txt()
-
-
 def gerar_pacientes(num_pacientes, nif_inicial):
     global pacientes
     localidades = ['Alfama', 'Baixa', 'Belém', 'Chiado', 'Graça', 'Mouraria', 'Parque das Nações', 'Restelo', 'Areeiro', 'Campo de Ourique']
@@ -319,31 +301,7 @@ def gerar_pacientes(num_pacientes, nif_inicial):
     
     return pacientes
 
-def escrever_population_txt(pacientes):
-    with open("populate5.sql", "w") as f:
-        f.write("-- Inserir Pacientes\n")
-        f.write("INSERT INTO paciente (ssn, nif, nome, telefone, morada, data_nasc) VALUES\n")
-        
-        values = []
-        for p in pacientes:
-            value = f"('{p['ssn']}', '{p['nif']}', '{p['nome']}', '{p['telefone']}', '{p['morada']}', '{p['data_nasc']}')"
-            values.append(value)
-        
-        f.write(",\n".join(values))
-        f.write(";")
-
-# Definir o número de pacientes e o NIF inicial (depois do último médico)
-num_pacientes = 5000
-nif_inicial = 601111112  # Ajustar conforme necessário
-
-# Gerar dados dos pacientes
-pacientes = gerar_pacientes(num_pacientes, nif_inicial)
-
-# Escrever dados no arquivo population.txt
-escrever_population_txt(pacientes)
-
 id_consulta = 1
-
 def gerar_consultas_pacientes(data_inicio, data_fim):
     global consultas
     global pacientes
@@ -452,98 +410,19 @@ def gerar_consultas_clinicas(data_inicio, data_fim):
                 consultas.append(consulta)
             
 def gerar_consultas(data_inicio, data_fim):
-    print(1)
+
     gerar_consultas_pacientes(data_inicio, data_fim)
-    print(2)
-    gerar_consultas_medicos(data_inicio, data_fim)
-    print(3)    
+    gerar_consultas_medicos(data_inicio, data_fim)   
     gerar_consultas_clinicas(data_inicio, data_fim)
-    print(4)
     
-    tamanho = int (len(consultas) *0.8)
+    tamanho = int (len(consultas) * 0.8)
     for i in range(tamanho):
         consulta = consultas[i]
         if consulta['codigo_sns'] is None:
-            consulta['codigo_sns'] = generate_codigo_sns()  
-
-
-
-def paciente_tem_consulta_no_horario(paciente, data_consulta, hora_consulta):
-    global consultas
-    for consulta in consultas:
-        if consulta['ssn'] == paciente['ssn'] and consulta['data'] == data_consulta and consulta['hora'] == hora_consulta:
-            return True
-    return False
-
-def medico_tem_consulta_no_horario(medico, data_consulta, hora_consulta):
-    global consultas
-    for consulta in consultas:
-        if consulta['nif'] == medico['nif'] and consulta['data'] == data_consulta and consulta['hora'] == hora_consulta:
-            return True
-    return False
-
-def get_clinica(nif_medico, dia_semana):
-    global trabalha
-    for item in trabalha:
-        if item['nif'] == nif_medico and item['dia_da_semana'] == dia_semana:
-            return item['nome']
-
-def random_date(start, end):
-    # Gerar uma data aleatória dentro do intervalo especificado
-    start_timestamp = start.timestamp()
-    end_timestamp = end.timestamp()
-    random_timestamp = random.uniform(start_timestamp, end_timestamp)
-    random_date = datetime.fromtimestamp(random_timestamp)
-    random_date_str = random_date.strftime("%Y-%m-%d")
-    return random_date_str
-
-def random_time_restrict():
-    # Gerar uma hora aleatória entre 8:00 e 19:00, exceto entre 13:00 e 14:00
-    hora = random.randint(8, 19)  
-    minutos = random.choice([0, 30]) 
-    while hora == 13 and minutos == 30 or hora == 19 and minutos == 30:
-        hora = random.randint(8, 19)  
-        minutos = random.choice([0, 30]) 
-
-    hora_consulta = '{:02d}:{:02d}:00'.format(hora, minutos)
-    # Verificar se a hora está dentro do intervalo permitido
-    return hora_consulta
+            consulta['codigo_sns'] = gerar_codigo_sns()  
     
-def get_medicos_clinica(dia_semana, clinica):
-    global medicos
-    medicos_clinica = []
-    for item in trabalha:
-        if item['nome'] == clinica['nome'] and item['dia_da_semana'] == dia_semana:
-            for medico in medicos:
-                if medico['nif'] == item['nif']:
-                    medicos_clinica.append(medico)
-    return medicos_clinica
-    
-def generate_codigo_sns():
+def gerar_codigo_sns():
     return ''.join([str(random.randint(0, 9)) for _ in range(12)])
-
-# Uso das funções
-gerar_consultas(data_inicio, data_fim)
-
-
-# Escrever dados no arquivo consultas.sql
-def escrever_consultas_em_sql(consultas):
-    with open("populate6.sql", "w") as f:
-        f.write("-- Inserir Consultas\n")
-        f.write("INSERT INTO consulta (id,ssn, nif, nome, data, hora, codigo_sns) VALUES\n")
-        
-        values = []
-        for consulta in consultas:
-            if consulta['codigo_sns'] is not None:
-                value = f"('{consulta['id']}','{consulta['ssn']}', '{consulta['nif']}', '{consulta['nome_clinica']}', '{consulta['data']}', '{consulta['hora']}', '{consulta['codigo_sns']}')"
-            else:
-                value = f"('{consulta['id']}','{consulta['ssn']}', '{consulta['nif']}', '{consulta['nome_clinica']}', '{consulta['data']}', '{consulta['hora']}', NULL)"
-            values.append(value)
-        
-        f.write(",\n".join(values))
-        f.write(";")
-
-escrever_consultas_em_sql(consultas)
 
 def gerar_receitas():
     global consultas
@@ -560,46 +439,6 @@ def gerar_receitas():
                     "medicamento": medicamento,
                     "quantidade": quantidade
                 })
-
-
-def escrever_receitas_em_sql(receitas):
-    with open("populate7.sql", "w") as f:
-        f.write("-- Inserir Receitas\n")
-        f.write("INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES\n")
-        
-        values = []
-        for receita in receitas:
-            value = f"('{receita['codigo_sns']}', '{receita['medicamento']}', {receita['quantidade']})"
-            values.append(value)
-        
-        f.write(",\n".join(values))
-        f.write(";")
-  
-# Uso das funções
-gerar_receitas()
-escrever_receitas_em_sql(receitas)
-
-
-sintomas = [
-    'Dor de cabeça', 'Náusea', 'Vómito', 'Febre', 'Tosse',
-    'Fadiga', 'Falta de ar', 'Tontura', 'Perda de apetite', 'Dor abdominal',
-    'Diarreia', 'Constipação', 'Dor no peito', 'Dor nas articulações', 'Dor muscular',
-    'Arrepios', 'Suores noturnos', 'Palpitações', 'Confusão mental', 'Visão turva',
-    'Zumbido nos ouvidos', 'Formigamento', 'Comichão', 'Erupção cutânea', 'Inchaço',
-    'Icterícia', 'Tosse com sangue', 'Dificuldade para engolir', 'Rigidez matinal',
-    'Perda de peso inexplicável', 'Incontinência urinária', 'Urgência urinária', 'Dores de garganta',
-    'Rouquidão', 'Sonolência', 'Alterações de humor', 'Depressão', 'Ansiedade',
-    'Insônia', 'Pesadelos', 'Paralisia', 'Espasmos musculares', 'Fraqueza',
-    'Tremores', 'Sensação de desmaio', 'Desmaios', 'Dor na lombar', 'Dor de dentes',
-    'Queimação ao urinar', 'Alterações no paladar'
-]
-
-medicoes = [
-    'Temperatura corporal', 'Frequência cardíaca', 'Pressão arterial sistólica', 'Pressão arterial diastólica', 'Saturação de oxigênio',
-    'Nível de glicose no sangue', 'Peso corporal', 'Altura', 'Índice de massa corporal', 'Taxa de respiração',
-    'Nível de colesterol total', 'Nível de HDL', 'Nível de LDL', 'Nível de triglicerídeos', 'Taxa de filtração glomerular',
-    'Volume urinário', 'Taxa de sedimentação de eritrócitos', 'Hemoglobina', 'Contagem de leucócitos'
-]
 
 def gerar_observacoes():
     global consultas
@@ -624,27 +463,6 @@ def gerar_observacoes():
                 "medicao": metrica,
                 "valor": valor
             })
-
-def escrever_observacoes_em_sql(observacoes):
-    with open("populate8.sql", "w") as f:
-        f.write("-- Inserir Observações\n")
-        f.write("INSERT INTO observacao (id, parametro, valor) VALUES\n")
-        
-        values = []
-        for observacao in observacoes:
-            if observacao['valor'] is not None:
-                value = f"('{observacao['id']}', '{observacao['medicao']}', {observacao['valor']})"
-            else:
-                value = f"('{observacao['id']}', '{observacao['sintoma']}', NULL)"
-            values.append(value)
-        
-        f.write(",\n".join(values))
-        f.write(";")
-
-# Uso das funções
-gerar_observacoes()
-escrever_observacoes_em_sql(observacoes)
-
 
 def gerar_horarios_disponiveis():
     global medicos
@@ -672,3 +490,143 @@ def gerar_horarios_disponiveis():
             })
             possivel_hora = datetime.time(possivel_hora.hour, possivel_hora.minute + 30)
     return horarios_disponiveis
+
+# Funções de escrita
+def escrever_clinicas(clinicas):
+    nome_arquivo = "populate1.sql"
+    with open(nome_arquivo, 'w') as file:
+        file.write("-- Inserir Clínicas\n")
+        file.write("INSERT INTO clinica (nome, telefone, morada) VALUES\n")
+        for clinica in clinicas[:-1]:
+            linha = f"('{clinica['nome']}', '{clinica['telefone']}', '{clinica['morada']}'),\n"
+            file.write(linha)
+        clinica = clinicas[-1]
+        linha = f"('{clinica['nome']}', '{clinica['telefone']}', '{clinica['morada']}');\n"
+        file.write(linha)
+
+def escrever_enfermeiros(enfermeiros):
+    nome_arquivo = "populate2.sql"
+    with open(nome_arquivo, 'w') as file:
+        file.write("-- Inserir Enfermeiros\n")
+        file.write("INSERT INTO enfermeiro (nif, nome, telefone, morada, nome_clinica) VALUES\n")
+        for enfermeiro in enfermeiros[:-1]:
+            linha = f"('{enfermeiro['nif']}', '{enfermeiro['nome']}', '{enfermeiro['telefone']}', '{enfermeiro['morada']}', '{enfermeiro['nome_clinica']}'),\n"
+            file.write(linha)
+        enfermeiro = enfermeiros[-1]
+        linha = f"('{enfermeiro['nif']}', '{enfermeiro['nome']}', '{enfermeiro['telefone']}', '{enfermeiro['morada']}', '{enfermeiro['nome_clinica']}');\n"
+        file.write(linha)
+
+def escrever_medicos(medicos):
+    nome_arquivo = "populate3.sql"
+    with open(nome_arquivo, 'w') as file:
+        file.write("-- Inserir Médicos\n")
+        file.write("INSERT INTO medico (nif, nome, telefone, morada, especialidade) VALUES\n")
+        for medico in medicos[:-1]:
+            linha = f"('{medico['nif']}', '{medico['nome']}', '{medico['telefone']}', '{medico['morada']}', '{medico['especialidade']}'),\n"
+            file.write(linha)
+        medico = medicos[-1]
+        linha = f"('{medico['nif']}', '{medico['nome']}', '{medico['telefone']}', '{medico['morada']}', '{medico['especialidade']}');\n"
+        file.write(linha)
+
+def escrever_trabalha():
+    global trabalha
+    nome_arquivo = "populate4.sql"
+    with open(nome_arquivo, 'w') as file:
+        file.write("-- Inserir Trabalha\n")
+        file.write("INSERT INTO trabalha (nif, nome, dia_da_semana) VALUES\n")
+        for entry in trabalha[:-1]:
+            x = entry['dia_da_semana']
+            day = None
+            if x == 6:
+                day = 0
+            else:
+                day = x + 1
+            
+            linha = f"('{entry['nif']}', '{entry['nome']}', {day}),\n"
+            file.write(linha)
+        entry = trabalha[-1]
+        linha = f"('{entry['nif']}', '{entry['nome']}', {day});\n"
+        file.write(linha)
+
+def escrever_pacientes(pacientes):
+    with open("populate5.sql", "w") as f:
+        f.write("-- Inserir Pacientes\n")
+        f.write("INSERT INTO paciente (ssn, nif, nome, telefone, morada, data_nasc) VALUES\n")
+        
+        values = []
+        for p in pacientes:
+            value = f"('{p['ssn']}', '{p['nif']}', '{p['nome']}', '{p['telefone']}', '{p['morada']}', '{p['data_nasc']}')"
+            values.append(value)
+        
+        f.write(",\n".join(values))
+        f.write(";")
+
+def escrever_consultas(consultas):
+    with open("populate6.sql", "w") as f:
+        f.write("-- Inserir Consultas\n")
+        f.write("INSERT INTO consulta (id,ssn, nif, nome, data, hora, codigo_sns) VALUES\n")
+        
+        values = []
+        for consulta in consultas:
+            if consulta['codigo_sns'] is not None:
+                value = f"('{consulta['id']}','{consulta['ssn']}', '{consulta['nif']}', '{consulta['nome_clinica']}', '{consulta['data']}', '{consulta['hora']}', '{consulta['codigo_sns']}')"
+            else:
+                value = f"('{consulta['id']}','{consulta['ssn']}', '{consulta['nif']}', '{consulta['nome_clinica']}', '{consulta['data']}', '{consulta['hora']}', NULL)"
+            values.append(value)
+        
+        f.write(",\n".join(values))
+        f.write(";")
+
+def escrever_receitas(receitas):
+    with open("populate7.sql", "w") as f:
+        f.write("-- Inserir Receitas\n")
+        f.write("INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES\n")
+        
+        values = []
+        for receita in receitas:
+            value = f"('{receita['codigo_sns']}', '{receita['medicamento']}', {receita['quantidade']})"
+            values.append(value)
+        
+        f.write(",\n".join(values))
+        f.write(";")
+  
+def escrever_observacoes(observacoes):
+    with open("populate8.sql", "w") as f:
+        f.write("-- Inserir Observações\n")
+        f.write("INSERT INTO observacao (id, parametro, valor) VALUES\n")
+        
+        values = []
+        for observacao in observacoes:
+            if observacao['valor'] is not None:
+                value = f"('{observacao['id']}', '{observacao['medicao']}', {observacao['valor']})"
+            else:
+                value = f"('{observacao['id']}', '{observacao['sintoma']}', NULL)"
+            values.append(value)
+        
+        f.write(",\n".join(values))
+        f.write(";")
+
+# Criar clinicas
+gerar_clinicas(5)
+escrever_clinicas(clinicas)
+# Criar enfermeiros
+gerar_enfermeiros(5, clinicas)
+escrever_enfermeiros(enfermeiros)
+# Criar médicos
+gerar_medicos()
+escrever_medicos(medicos)
+# Atribuir trabalhos
+gerar_trabalha()
+escrever_trabalha()
+# Criar pacientes
+pacientes = gerar_pacientes(5000, 601111112)
+escrever_pacientes(pacientes)
+# Gerar consultas
+gerar_consultas(data_inicio, data_fim)
+escrever_consultas(consultas)
+# Gerar receitas
+gerar_receitas()
+escrever_receitas(receitas)
+# Gerar observações
+gerar_observacoes()
+escrever_observacoes(observacoes)
