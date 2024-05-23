@@ -630,3 +630,10 @@ escrever_receitas(receitas)
 # Gerar observações
 gerar_observacoes()
 escrever_observacoes(observacoes)
+
+# Juntar os ficheiros SQL gerados
+with open('populate_geral.sql', 'w') as arquivo_final:
+    for nome_arquivo in ['populate1.sql', 'populate2.sql', 'populate3.sql', 'populate4.sql',\
+        'populate5.sql', 'populate6.sql', 'populate7.sql', 'populate8.sql']:
+        with open(nome_arquivo, 'r') as arquivo_atual:
+            arquivo_final.write(arquivo_atual.read() + '\n')
