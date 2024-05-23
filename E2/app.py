@@ -75,12 +75,13 @@ def clinics_doctors_slots(clinica, especialidade):
         with conn.cursor(row_factory=namedtuple_row) as cur:
             doctors = cur.execute(
                 """
-                SELECT m.nome
-                FROM medico m, 
-                    trabalha t,
-                    clinica c
-                WHERE m.nif = t.nif AND t.nome = c.nome AND 
-                    c.nome = %(clinica)s AND m.especialidade = %(especialidade)s;
+            SELECT hd.nif, hd.nome, hd.data, hd.hora
+            FROM horario_disponivel hd
+                WHERE c.nome = %(clinica)s
+                AND m.especialidade = %(especialidade)s
+                AND (hd.data > CURRENT_DATE OR (hd.data = CURRENTE_DATE AND hd.hora > CURRETN_TIME))
+            ORDER BY hd.data, hd.hora
+            LIMIT 3;
                 """,
                 {"clinica": clinica}, {"especialidade": especialidade},
             ).fetchall()

@@ -197,7 +197,7 @@ def gerar_clinicas(num_clinicas):
         morada = f"{random.choice(ruas_lisboa)}, 1000-{random.randint(100, 999)} {random.choice(localidades)}"
         clinicas.append({"nome": nome_clinica, "telefone": telefone, "morada": morada})
 
-def gerar_enfermeiros(num_enfermeiros, clinicas):
+def gerar_enfermeiros(num_enfermeiros):
     global enfermeiros
     for clinica in clinicas:
         nome_clinica = clinica['nome']
@@ -299,16 +299,18 @@ def gerar_pacientes(num_pacientes, nif_inicial):
             "data_nasc": data_nasc
         })
     
-    return pacientes
 
 id_consulta = 1
-def gerar_consultas_pacientes(data_inicio, data_fim):
+
+def gerar_consultas_pacientes():
     global consultas
     global pacientes
     global medicos
     global clinicas
     global trabalha
     global id_consulta
+    global data_inicio
+    global data_fim
     
     for paciente in pacientes :
 
@@ -341,11 +343,13 @@ def gerar_consultas_pacientes(data_inicio, data_fim):
         id_consulta += 1
         consultas.append(consulta)
 
-def gerar_consultas_medicos(data_inicio, data_fim):
+def gerar_consultas_medicos():
     global consultas
     global medicos
     global pacientes
-    global id_consulta  
+    global id_consulta
+    global data_inicio
+    global data_fim  
 
     for day in range((data_fim - data_inicio).days + 1):
         data_consulta = (data_inicio + timedelta(days=day)).date()
@@ -373,12 +377,14 @@ def gerar_consultas_medicos(data_inicio, data_fim):
                 id_consulta += 1
                 consultas.append(consulta)
 
-def gerar_consultas_clinicas(data_inicio, data_fim):
+def gerar_consultas_clinicas():
     global consultas
     global clinicas
     global pacientes
     global medicos
     global id_consulta
+    global data_inicio
+    global data_fim
 
     for day in range((data_fim - data_inicio).days + 1):
 
@@ -409,11 +415,10 @@ def gerar_consultas_clinicas(data_inicio, data_fim):
                 id_consulta += 1
                 consultas.append(consulta)
             
-def gerar_consultas(data_inicio, data_fim):
-
-    gerar_consultas_pacientes(data_inicio, data_fim)
-    gerar_consultas_medicos(data_inicio, data_fim)   
-    gerar_consultas_clinicas(data_inicio, data_fim)
+def gerar_consultas():
+    gerar_consultas_pacientes()
+    gerar_consultas_medicos()   
+    gerar_consultas_clinicas()
     
     tamanho = int (len(consultas) * 0.8)
     for i in range(tamanho):
@@ -464,35 +469,41 @@ def gerar_observacoes():
                 "valor": valor
             })
 
+
 def gerar_horarios_disponiveis():
     global medicos
     global clinicas
     global horarios_disponiveis
     global consultas
+    
+    nova_data_inicio = datetime.now().date()
+    nova_data_fim = datetime.now().date() + timedelta(days=30)
 
-    for day in range((data_fim - data_inicio).days + 1):
-        possivel_data = (data_inicio + timedelta(days=day)).date()
-        possivel_hora = datetime.time(8, 0)
+    for day in range((nova_data_fim - nova_data_inicio).days + 1):
+        
+        possivel_data = (nova_data_inicio + timedelta(days=day))
+        possivel_data_str = possivel_data.strftime("%Y-%m-%d")
+    
         for medico in medicos:
-            while medico_tem_consulta_no_horario(medico, possivel_data, possivel_hora):
-                possivel_hora = datetime.time(possivel_hora.hour, possivel_hora.minute + 30)
-            if possivel_hora == datetime.time(13, 30):
-                possivel_hora = datetime.time(14, 0)
-            elif possivel_hora > datetime.time(19, 0):
-                continue
-            clinica =  get_clinica(medico['nif'], possivel_data.weekday())
-            horarios_disponiveis.append({
-                "nif": medico['nif'],
-                "clinica": clinica['nome'],
-                "especialidade": medico['especialidade'],
-                "data": possivel_data,
-                "hora": possivel_hora
-            })
-            possivel_hora = datetime.time(possivel_hora.hour, possivel_hora.minute + 30)
-    return horarios_disponiveis
+            for hora in range(8, 20):
+                for minuto in [0, 30]:
+                    possivel_hora = '{:02d}:{:02d}:00'.format(hora, minuto)
+                    if hora == 13 and minuto == 30 or hora == 19 and minuto == 30:
+                        continue
+                    nome_clinica = get_clinica(medico['nif'], possivel_data.weekday())
+                    if not medico_tem_consulta_no_horario(medico, possivel_data_str, possivel_hora)\
+                        and nome_clinica is not None:
+                        horarios_disponiveis.append({
+                            "nif": medico['nif'],
+                            "nome_clinica": nome_clinica, 
+                            "especialidade": medico['especialidade'],
+                            "data": possivel_data_str,
+                            "hora": possivel_hora
+                        })
 
 # Funções de escrita
-def escrever_clinicas(clinicas):
+def escrever_clinicas():
+    global clinicas
     nome_arquivo = "populate1.sql"
     with open(nome_arquivo, 'w') as file:
         file.write("-- Inserir Clínicas\n")
@@ -504,7 +515,8 @@ def escrever_clinicas(clinicas):
         linha = f"('{clinica['nome']}', '{clinica['telefone']}', '{clinica['morada']}');\n"
         file.write(linha)
 
-def escrever_enfermeiros(enfermeiros):
+def escrever_enfermeiros():
+    global enfermeiros
     nome_arquivo = "populate2.sql"
     with open(nome_arquivo, 'w') as file:
         file.write("-- Inserir Enfermeiros\n")
@@ -516,7 +528,8 @@ def escrever_enfermeiros(enfermeiros):
         linha = f"('{enfermeiro['nif']}', '{enfermeiro['nome']}', '{enfermeiro['telefone']}', '{enfermeiro['morada']}', '{enfermeiro['nome_clinica']}');\n"
         file.write(linha)
 
-def escrever_medicos(medicos):
+def escrever_medicos():
+    global medicos
     nome_arquivo = "populate3.sql"
     with open(nome_arquivo, 'w') as file:
         file.write("-- Inserir Médicos\n")
@@ -548,7 +561,8 @@ def escrever_trabalha():
         linha = f"('{entry['nif']}', '{entry['nome']}', {day});\n"
         file.write(linha)
 
-def escrever_pacientes(pacientes):
+def escrever_pacientes():
+    global pacientes
     with open("populate5.sql", "w") as f:
         f.write("-- Inserir Pacientes\n")
         f.write("INSERT INTO paciente (ssn, nif, nome, telefone, morada, data_nasc) VALUES\n")
@@ -561,7 +575,8 @@ def escrever_pacientes(pacientes):
         f.write(",\n".join(values))
         f.write(";")
 
-def escrever_consultas(consultas):
+def escrever_consultas():
+    global consultas
     with open("populate6.sql", "w") as f:
         f.write("-- Inserir Consultas\n")
         f.write("INSERT INTO consulta (id,ssn, nif, nome, data, hora, codigo_sns) VALUES\n")
@@ -577,7 +592,8 @@ def escrever_consultas(consultas):
         f.write(",\n".join(values))
         f.write(";")
 
-def escrever_receitas(receitas):
+def escrever_receitas():
+    global receitas
     with open("populate7.sql", "w") as f:
         f.write("-- Inserir Receitas\n")
         f.write("INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES\n")
@@ -590,7 +606,8 @@ def escrever_receitas(receitas):
         f.write(",\n".join(values))
         f.write(";")
   
-def escrever_observacoes(observacoes):
+def escrever_observacoes():
+    global observacoes
     with open("populate8.sql", "w") as f:
         f.write("-- Inserir Observações\n")
         f.write("INSERT INTO observacao (id, parametro, valor) VALUES\n")
@@ -606,34 +623,52 @@ def escrever_observacoes(observacoes):
         f.write(",\n".join(values))
         f.write(";")
 
+def escrever_horarios():
+    global horarios_disponiveis
+    with open("populate9.sql", "w") as f:
+        f.write("-- Inserir Horários Disponíveis\n")
+        f.write("INSERT INTO horario_disponivel (nif, nome_clinica, especialidade, data, hora) VALUES\n")
+        
+        values = []
+        for horario in horarios_disponiveis:
+            value = f"('{horario['nif']}', '{horario['nome_clinica']}', '{horario['especialidade']}', '{horario['data']}', '{horario['hora']}')"
+            values.append(value)
+        
+        f.write(",\n".join(values))
+        f.write(";")
+
+
 # Criar clinicas
 gerar_clinicas(5)
-escrever_clinicas(clinicas)
+escrever_clinicas()
 # Criar enfermeiros
-gerar_enfermeiros(5, clinicas)
-escrever_enfermeiros(enfermeiros)
+gerar_enfermeiros(5)
+escrever_enfermeiros()
 # Criar médicos
 gerar_medicos()
-escrever_medicos(medicos)
+escrever_medicos()
 # Atribuir trabalhos
 gerar_trabalha()
 escrever_trabalha()
 # Criar pacientes
-pacientes = gerar_pacientes(5000, 601111112)
-escrever_pacientes(pacientes)
+gerar_pacientes(5000, 601111112)
+escrever_pacientes()
 # Gerar consultas
-gerar_consultas(data_inicio, data_fim)
-escrever_consultas(consultas)
+gerar_consultas()
+escrever_consultas()
 # Gerar receitas
 gerar_receitas()
-escrever_receitas(receitas)
+escrever_receitas()
 # Gerar observações
 gerar_observacoes()
-escrever_observacoes(observacoes)
+escrever_observacoes()
+# Gerar horários disponíveis
+gerar_horarios_disponiveis()
+escrever_horarios()
 
 # Juntar os ficheiros SQL gerados
 with open('populate_geral.sql', 'w') as arquivo_final:
     for nome_arquivo in ['populate1.sql', 'populate2.sql', 'populate3.sql', 'populate4.sql',\
-        'populate5.sql', 'populate6.sql', 'populate7.sql', 'populate8.sql']:
+        'populate5.sql', 'populate6.sql', 'populate7.sql', 'populate8.sql', 'populate9.sql']:
         with open(nome_arquivo, 'r') as arquivo_atual:
             arquivo_final.write(arquivo_atual.read() + '\n')
