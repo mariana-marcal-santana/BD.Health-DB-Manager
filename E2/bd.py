@@ -261,15 +261,16 @@ def escrever_trabalha_em_txt():
         file.write("INSERT INTO trabalha (nif, nome, dia_da_semana) VALUES\n")
         for entry in trabalha[:-1]:
             x = entry['dia_da_semana']
+            day = None
             if x == 6:
-                x = 0
+                day = 0
             else:
-                x += 1
+                day = x + 1
             
-            linha = f"('{entry['nif']}', '{entry['nome']}', {x}),\n"
+            linha = f"('{entry['nif']}', '{entry['nome']}', {day}),\n"
             file.write(linha)
         entry = trabalha[-1]
-        linha = f"('{entry['nif']}', '{entry['nome']}', {entry['dia_da_semana']});\n"
+        linha = f"('{entry['nif']}', '{entry['nome']}', {day});\n"
         file.write(linha)
 
 # Uso das funções
