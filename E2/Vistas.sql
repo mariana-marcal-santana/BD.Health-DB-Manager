@@ -10,9 +10,7 @@ SELECT
     EXTRACT(MONTH FROM c.data) AS mes,
     EXTRACT(DAY FROM c.data) AS dia_do_mes,
     TO_CHAR(c.data, 'Day') AS dia_da_semana,
-    SUBSTRING(cl.morada FROM '[0-9]{4}-[0-9]{3} (.+)') AS localidade
-    --EXTRACT(DOW FROM c.data) AS dia_da_semana,
-    --cl.morada AS localidade, com SUBSTRING
+    SUBSTRING(cl.morada FROM '[0-9]{4}-[0-9]{3} (.+)') AS localidade,
     m.especialidade,
     'observacao' AS tipo,
     o.parametro AS chave,
@@ -37,9 +35,7 @@ SELECT
     EXTRACT(MONTH FROM c.data) AS mes,
     EXTRACT(DAY FROM c.data) AS dia_do_mes,
     TO_CHAR(c.data, 'Day') AS dia_da_semana,
-    SUBSTRING(cl.morada FROM '[0-9]{4}-[0-9]{3} (.+)') AS localidade
-    --EXTRACT(DOW FROM c.data) AS dia_da_semana,
-    --cl.morada AS localidade, com SUBSTRING
+    SUBSTRING(cl.morada FROM '[0-9]{4}-[0-9]{3} (.+)') AS localidade,
     m.especialidade,
     'receita' AS tipo,
     r.medicamento AS chave,
