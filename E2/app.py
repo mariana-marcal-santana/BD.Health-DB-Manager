@@ -86,7 +86,7 @@ def clinics_doctors_slots(clinica, especialidade):
                 ORDER BY c.data, c.hora
                 LIMIT 3;
                 """,
-                {"clinica": clinica}, {"especialidade": especialidade},
+                {"clinica": clinica, "especialidade": especialidade},
             ).fetchall()
             log.debug(f"Found {cur.rowcount} rows.")
 
