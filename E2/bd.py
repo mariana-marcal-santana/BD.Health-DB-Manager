@@ -268,14 +268,12 @@ def gerar_trabalha():
             dias_trabalho = random.sample(range(7), dias)
             clinicas_possiveis = random.sample(clinicas, dias)
         
-        i = 0
-        for dia in dias_trabalho:
+        for i in range(dias):
             trabalha.append({
                 "nif": medico['nif'],
                 "nome": clinicas_possiveis[i]['nome'],
-                "dia_da_semana": dia
+                "dia_da_semana": dias_trabalho[i]
             })
-            i += 1
 
 def gerar_pacientes(num_pacientes, nif_inicial):
     global pacientes
