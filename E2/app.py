@@ -76,12 +76,12 @@ def clinics_doctors_slots(clinica, especialidade):
             doctors = cur.execute(
                 """
                 SELECT m.nome, h.data, h.hora
-                FROM medico m,
+                FROM medico m
                     JOIN consulta c ON m.nif = c.nif
                     JOIN trabalha t ON c.nif = t.nif
                     JOIN clinica cl ON t.nome = cl.nome
-                    LEFT JOIN horario_disponivel h ON c.data = h.nif AND c.hora = h.hora
-                WHERE h.nif = m.nif AND cl.nome = %(clinica)s AND m.especialidade = %(especialidade)s
+                    LEFT JOIN horario_disponivel h ON c.data = h.data AND c.hora = h.hora
+                WHERE cl.nome = %(clinica)s AND m.especialidade = %(especialidade)s
                     AND  h.data >= CURRENT_DATE AND h.hora >= CURRENT_TIME 
                 ORDER BY h.data, h.hora
                 LIMIT 3;
