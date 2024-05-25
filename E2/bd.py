@@ -149,10 +149,10 @@ def random_date(start, end):
 
 def random_time_restrict():
     # Gerar uma hora aleatória entre 8:00 e 19:00, exceto entre 13:00 e 14:00
-    hora = random.randint(8, 19)  
+    hora = random.randint(8, 18)  
     minutos = random.choice([0, 30]) 
-    while hora == 13 and minutos == 30 or hora == 19 and minutos == 30:
-        hora = random.randint(8, 19)  
+    while hora == 13 :
+        hora = random.randint(8, 18)  
         minutos = random.choice([0, 30]) 
 
     hora_consulta = '{:02d}:{:02d}:00'.format(hora, minutos)
@@ -169,19 +169,13 @@ def get_medicos_clinica(dia_semana, clinica):
                     medicos_clinica.append(medico)
     return medicos_clinica
 
-def medico_trabalha_no_dia(medico, dia_semana):
-    global trabalha
-    for item in trabalha:
-        if item['nif'] == medico['nif'] and item['dia_da_semana'] == dia_semana:
-            return True
-    return False
 
 def medicos_livres(dia_semana):
     global medicos
     global trabalha 
     medicos_livres_ = []
     for medico in medicos:
-        if not medico_trabalha_no_dia(medico, dia_semana):
+        if not any(item['nif'] == medico['nif'] and item['dia_da_semana'] == dia_semana for item in trabalha):
             medicos_livres_.append(medico)
     return medicos_livres_
 
@@ -225,41 +219,46 @@ def gerar_medicos():
             "especialidade": especialidade
         })
 
+def get_medicos_sem_trabalho():
+    global medicos
+    global trabalha
+    medicos_sem_trabalho = []
+    for medico in medicos:
+        if not any(item['nif'] == medico['nif'] for item in trabalha):
+            medicos_sem_trabalho.append(medico)
+    return medicos_sem_trabalho
+
 def gerar_trabalha():
-   
     global trabalha
     global medicos
-    # Atribuindo médicos a duas clínicas em dois dias da semana
+    global clinicas
     
-    for medico in medicos:
-        duas_clinicas = random.sample(clinicas, 2)
-        dias_semana = random.sample(range(7), 2)
-        while dias_semana[0] == dias_semana[1]:
-            print("Dias iguais")
-            dias_semana = random.sample(range(7), 2)
-        for i in range(2):
-            trabalha.append({
-                "nif": medico['nif'],
-                "nome": duas_clinicas[i]['nome'],
-                "dia_da_semana": dias_semana[i]
-            })
-
-    for dia_semana in range(7):
+    for i in range (7):
         for clinica in clinicas:
-            for i in range(8):  
-                medicos_livres_ = medicos_livres(dias_semana)
-                if medicos_livres_ == []:
-                    print(f"Nenhum médico disponível em {dia_semana} para a clínica {clinica['nome']}")
-                    continue
-                medico = random.choice(medicos_livres_)
+            medicos_livres_ = medicos_livres(i)
+            for j in range (8):
+                medico = medicos_livres_[j]
                 trabalha.append({
                     "nif": medico['nif'],
                     "nome": clinica['nome'],
-                    "dia_da_semana": dia_semana
+                    "dia_da_semana": i
                 })
-                for medico in medicos_livres_:
-                    medicos_livres_.remove(medico)
-            
+
+    medicos_sem_trabalho = get_medicos_sem_trabalho()
+    for medico in medicos_sem_trabalho:
+        dias_trabalho = random.sample(range(7), 2)
+        while dias_trabalho[0] == dias_trabalho[1]:
+            dias_trabalho = random.sample(range(7), 2)
+        clinicas_possiveis= random.sample(clinicas, 2)
+        i = 0 
+        for dia in dias_trabalho:
+            trabalha.append({
+                "nif": medico['nif'],
+                "nome": clinicas_possiveis[i]['nome'],
+                "dia_da_semana": dia
+            })
+            i += 1
+
 def gerar_pacientes(num_pacientes, nif_inicial):
     global pacientes
     localidades = ['Alfama', 'Baixa', 'Belém', 'Chiado', 'Graça', 'Mouraria', 'Parque das Nações', 'Restelo', 'Areeiro', 'Campo de Ourique']
@@ -323,6 +322,10 @@ def gerar_consultas_pacientes():
         clinica = random.choice(clinicas)
         nome_clinica = clinica['nome']
         medicos_clinica = get_medicos_clinica(dia_semana, clinica)
+
+        if not medicos_clinica:
+            continue
+
         medico = random.choice(medicos_clinica)
 
         while medico_tem_consulta_no_horario(medico, data_consulta_str, hora_consulta):
@@ -480,26 +483,12 @@ def gerar_horarios_disponiveis():
     nova_data_fim = datetime.now().date() + timedelta(days=30)
 
     for day in range((nova_data_fim - nova_data_inicio).days + 1):
-        
-        possivel_data = (nova_data_inicio + timedelta(days=day))
-        possivel_data_str = possivel_data.strftime("%Y-%m-%d")
-    
-        for medico in medicos:
-            for hora in range(8, 20):
-                for minuto in [0, 30]:
-                    possivel_hora = '{:02d}:{:02d}:00'.format(hora, minuto)
-                    if hora == 13 and minuto == 30 or hora == 19 and minuto == 30:
-                        continue
-                    nome_clinica = get_clinica(medico['nif'], possivel_data.weekday())
-                    if not medico_tem_consulta_no_horario(medico, possivel_data_str, possivel_hora)\
-                        and nome_clinica is not None:
-                        horarios_disponiveis.append({
-                            "nif": medico['nif'],
-                            "nome_clinica": nome_clinica, 
-                            "especialidade": medico['especialidade'],
-                            "data": possivel_data_str,
-                            "hora": possivel_hora
-                        })
+        for hora in range(8, 19):
+            for minuto in range(0,30):
+                horarios_disponiveis.append({
+                    "hora": f"{hora:02d}:{minuto:02d}:00",
+                    "data": (nova_data_inicio + timedelta(days=day)).strftime("%Y-%m-%d")
+                })
 
 # Funções de escrita
 def escrever_clinicas():
@@ -627,13 +616,12 @@ def escrever_horarios():
     global horarios_disponiveis
     with open("populate9.sql", "w") as f:
         f.write("-- Inserir Horários Disponíveis\n")
-        f.write("INSERT INTO horario_disponivel (nif, nome_clinica, especialidade, data, hora) VALUES\n")
+        f.write("INSERT INTO horario_disponivel (data, hora) VALUES\n")
         
         values = []
         for horario in horarios_disponiveis:
-            value = f"('{horario['nif']}', '{horario['nome_clinica']}', '{horario['especialidade']}', '{horario['data']}', '{horario['hora']}')"
+            value = f"('{horario['data']}', '{horario['hora']}')"
             values.append(value)
-        
         f.write(",\n".join(values))
         f.write(";")
 

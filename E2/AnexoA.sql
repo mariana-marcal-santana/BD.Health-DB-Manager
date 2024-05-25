@@ -36,9 +36,10 @@ CREATE TABLE medico(
 );
 
 CREATE TABLE trabalha(
-    nif CHAR(9) NOT NULL REFERENCES medico,
-    nome VARCHAR(80) NOT NULL REFERENCES clinica,
-    dia_da_semana SMALLINT
+    nif CHAR(9) NOT NULL REFERENCES medico(nif),
+    nome VARCHAR(80) NOT NULL REFERENCES clinica(nome),
+    dia_da_semana SMALLINT,
+    PRIMARY KEY (nif, nome, dia_da_semana)
 );
 
 CREATE TABLE paciente(
@@ -52,7 +53,7 @@ CREATE TABLE paciente(
 
 CREATE TABLE consulta_auxiliar(
     id SERIAL PRIMARY KEY,
-    ssn CHAR(11) NOT NULL REFERENCES paciente,
+    ssn CHAR(11) NOT NULL REFERENCES paciente(ssn),
     data DATE NOT NULL,
     hora TIME NOT NULL,
     codigo_sns CHAR(12) UNIQUE CHECK (codigo_sns ~ '^[0-9]+$'),
@@ -61,9 +62,9 @@ CREATE TABLE consulta_auxiliar(
 
 CREATE TABLE consulta(
     id SERIAL PRIMARY KEY,
-    ssn CHAR(11) NOT NULL REFERENCES paciente,
-    nif CHAR(9) NOT NULL REFERENCES medico,
-    nome VARCHAR(80) NOT NULL REFERENCES clinica,
+    ssn CHAR(11) NOT NULL REFERENCES paciente(ssn),
+    nif CHAR(9) NOT NULL REFERENCES medico(nif),
+    nome VARCHAR(80) NOT NULL REFERENCES clinica(nome),
     data DATE NOT NULL,
     hora TIME NOT NULL,
     codigo_sns CHAR(12) UNIQUE CHECK (codigo_sns ~ '^[0-9]+$'),
@@ -72,40 +73,50 @@ CREATE TABLE consulta(
 );
 
 CREATE TABLE receita(
-    codigo_sns VARCHAR(12) NOT NULL REFERENCES consulta (codigo_sns),
+    codigo_sns VARCHAR(12) NOT NULL REFERENCES consulta(codigo_sns),
     medicamento VARCHAR(155) NOT NULL,
     quantidade SMALLINT NOT NULL CHECK (quantidade > 0),
     PRIMARY KEY (codigo_sns, medicamento)
 );
 
 CREATE TABLE observacao(
-    id INTEGER NOT NULL REFERENCES consulta,
+    id INTEGER NOT NULL REFERENCES consulta(id),
     parametro VARCHAR(155) NOT NULL,
     valor FLOAT,
     PRIMARY KEY (id, parametro)
 );
 
 CREATE TABLE horario_disponivel(
-    nif CHAR(9) NOT NULL REFERENCES medico,
-    nome_clinica VARCHAR(80) NOT NULL REFERENCES clinica,
-    especialidade VARCHAR(80) NOT NULL,
     data DATE NOT NULL,
     hora TIME NOT NULL,
-    PRIMARY KEY (nif, nome_clinica, especialidade, data, hora)
+    PRIMARY KEY (data, hora)
 );
-
 
 ----------------------------------------
 -- Restrictions and Triggers
 ----------------------------------------
 
+CREATE OR REPLACE FUNCTION check_horario_consulta()
+RETURNS TRIGGER AS $$
+BEGIN  
+    IF NEW.hora >= '08:00:00' AND NEW.hora <= '18:30:00' 
+        AND NOT NEW.hora = '13:00:00' THEN 
+        RETURN NEW;
+    ELSE
+        RAISE EXCEPTION 'A consulta deve ser agendada entre as 8h e as 19h, exceto entre as 13h e às 14h';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER horario_consulta_trigger
+BEFORE INSERT OR UPDATE ON consulta
+FOR EACH ROW EXECUTE FUNCTION check_horario_consulta();
+
 CREATE OR REPLACE FUNCTION remove_horario_disponivel()
 RETURNS TRIGGER AS $$
 BEGIN
     DELETE FROM horario_disponivel
-    WHERE nif = NEW.nif
-    AND nome_clinica = NEW.nome
-    AND data = NEW.data
+    WHERE data = NEW.data
     AND hora = NEW.hora;
     RETURN NEW;
 END;
@@ -114,7 +125,6 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER remove_horario_trigger
 AFTER INSERT ON consulta
 FOR EACH ROW EXECUTE FUNCTION remove_horario_disponivel();
-
 
 CREATE OR REPLACE FUNCTION check_medico_paciente()
 RETURNS TRIGGER AS $$
@@ -159,8 +169,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 CREATE TRIGGER medico_clinica_dia_trigger
 BEFORE INSERT OR UPDATE ON consulta
 FOR EACH ROW EXECUTE FUNCTION check_medico_clinica_dia();
-
