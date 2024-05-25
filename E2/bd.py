@@ -500,7 +500,9 @@ def gerar_horarios_disponiveis():
 
     for day in range((nova_data_fim - nova_data_inicio).days + 1):
         for hora in range(8, 19):
-            for minuto in range(0,30):
+            for minuto in [0,30]:
+                if hora == 13:
+                    continue
                 horarios_disponiveis.append({
                     "hora": f"{hora:02d}:{minuto:02d}:00",
                     "data": (nova_data_inicio + timedelta(days=day)).strftime("%Y-%m-%d")
