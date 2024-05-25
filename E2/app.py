@@ -1,10 +1,13 @@
+#!/usr/bin/python3
+# Copyright (c) BDist Development Team
+# Distributed under the terms of the Modified BSD License.
 import os
 from logging.config import dictConfig
 
 import psycopg
 from flask import Flask, jsonify, request
 from psycopg.rows import namedtuple_row
-from datetime import date, time
+from datetime import date, time, datetime
 
 # Use the DATABASE_URL environment variable if it exists, otherwise use the default.
 # Use the format postgres://username:password@hostname/database_name to connect to the database.
@@ -76,13 +79,13 @@ def clinics_doctors_slots(clinica, especialidade):
             doctors = cur.execute(
                 """
                 SELECT m.nome, h.data, h.hora
-                FROM medico m
-                    JOIN consulta c ON m.nif = c.nif
-                    JOIN trabalha t ON c.nif = t.nif
-                    JOIN clinica cl ON t.nome = cl.nome
-                    LEFT JOIN horario_disponivel h ON c.data = h.data AND c.hora = h.hora
+                FROM horario_disponivel h
+                    LEFT JOIN consulta c ON c.data = h.data AND c.hora = h.hora
+                    JOIN medico m ON m.nif = c.nif
+                    JOIN trabalha t ON m.nif = t.nif
+                    JOIN clinica cl ON cl.nome = t.nome
                 WHERE cl.nome = %(clinica)s AND m.especialidade = %(especialidade)s
-                    AND  h.data >= CURRENT_DATE AND h.hora >= CURRENT_TIME 
+                   AND  h.data >= CURRENT_DATE AND h.hora >= CURRENT_TIME 
                 ORDER BY h.data, h.hora
                 LIMIT 3;
                 """,
@@ -106,8 +109,8 @@ def register_appointment(clinica):
     if not ssn or not nif or not data or not hora:
         error = "Args missing."
 
-    data_now = date.now()
-    hora_now = time.now()
+    data_now = date.today().strftime("%Y-%m-%d")
+    hora_now = datetime.now().time().strftime("%H:%M:%S")
 
     if data_now > data or (data_now == data and hora_now > hora):
         error = "Invalid date or time."
@@ -120,14 +123,20 @@ def register_appointment(clinica):
             with conn.cursor(row_factory=namedtuple_row) as cur:
                 cur.execute(
                     """
-                    INSERT INTO consulta (nif, ssn, data, hora, clinica)
-                    VALUES (%(nif)s, %(ssn)s, %(clinica)s, %(data)s, %(hora)s);
-                    """,
-                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+                    SELECT id + 1 AS last_id FROM consulta ORDER BY id DESC LIMIT 1;
+                    """
                 )
+                last_id = cur.fetchone()[0]
+                cur.execute(
+                    """
+                    INSERT INTO consulta (id, nif, ssn, nome, data, hora, codigo_sns)
+                    VALUES (%(last_id)s, %(nif)s, %(ssn)s, %(clinica)s, %(data)s, %(hora)s, NULL);
+                    """,
+                    {"last_id": last_id, "nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+                )
+
             conn.commit()
         return jsonify({"message": "Appointment registered successfully"}), 200
-
 
 @app.route("/a/<clinica>/cancelar/", methods=("POST",))
 def cancel_appointment(clinica):
@@ -143,8 +152,8 @@ def cancel_appointment(clinica):
     if not ssn or not nif or not data or not hora:
         error = "Args missing."
 
-    data_now = date.now()
-    hora_now = time.now()
+    data_now = date.today().strftime("%Y-%m-%d")
+    hora_now = datetime.now().time().strftime("%H:%M:%S")
 
     if data_now > data or (data_now == data and hora_now > hora):
         error = "Invalid date or time."
@@ -158,7 +167,7 @@ def cancel_appointment(clinica):
                 cur.execute(
                     """
                     DELETE FROM consulta
-                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND clinica = %(clinica)s;
+                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
                     """,
                     {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
                 )
