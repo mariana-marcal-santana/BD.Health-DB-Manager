@@ -1,8 +1,8 @@
 import random
 from datetime import datetime, timedelta
 
-data_inicio = datetime(2023, 12, 1)
-data_fim = datetime(2024, 1, 1)
+data_inicio = datetime(2024, 12, 1)
+data_fim = datetime(2025, 1, 1)
 
 ruas_lisboa = [
     "Rua Augusta", "Avenida da Liberdade", "Rua do Ouro", "Rua da Prata", 
@@ -204,13 +204,17 @@ def gerar_enfermeiros(num_enfermeiros):
 
 def gerar_medicos():
     global medicos
-    especialidades = ["clinica geral", "ortopedia", "cardiologia", "neurologia", "pediatria", "dermatologia", "urologia"]
+    outras_especialidades = ["ortopedia", "cardiologia", "neurologia", "pediatria", "dermatologia"]
     for i in range(1, 61):
+
         nif = str(i).zfill(9)
         nome_medico = f"Medico {i}"
         telefone = "2100000" + str(i + 20).zfill(2)
         morada = f"{random.choice(ruas_lisboa)}, 1000-{random.randint(100, 999)} Lisboa"
-        especialidade = especialidades[(i - 1) // 10]  # Alterna a cada 10 médicos
+
+        if i <= 20: especialidade = "clinica geral"
+        else: especialidade = random.choice(outras_especialidades)
+
         medicos.append({
             "nif": nif,
             "nome": nome_medico,
