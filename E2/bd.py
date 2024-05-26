@@ -1,8 +1,8 @@
 import random
 from datetime import datetime, timedelta
 
-data_inicio = datetime(2024, 12, 1)
-data_fim = datetime(2025, 1, 1)
+data_inicio = datetime(2025, 1, 1)
+data_fim = datetime(2026, 12, 31)
 
 ruas_lisboa = [
     "Rua Augusta", "Avenida da Liberdade", "Rua do Ouro", "Rua da Prata", 
@@ -651,30 +651,39 @@ def escrever_horarios():
 # Criar clinicas
 gerar_clinicas(5)
 escrever_clinicas()
+print(1)
 # Criar enfermeiros
 gerar_enfermeiros(5)
 escrever_enfermeiros()
+print(2)
 # Criar médicos
 gerar_medicos()
 escrever_medicos()
+print(3)
 # Atribuir trabalhos
 gerar_trabalha()
 escrever_trabalha()
+print(4)
 # Criar pacientes
 gerar_pacientes(5000, 601111112)
 escrever_pacientes()
+print(5)
 # Gerar consultas
 gerar_consultas()
 escrever_consultas()
+print(6)
 # Gerar receitas
 gerar_receitas()
 escrever_receitas()
+print(7)
 # Gerar observações
 gerar_observacoes()
 escrever_observacoes()
+print(8)
 # Gerar horários disponíveis
 gerar_horarios_disponiveis()
 escrever_horarios()
+print(9)
 
 # Juntar os ficheiros SQL gerados
 with open('populate_geral.sql', 'w') as arquivo_final:
