@@ -112,19 +112,6 @@ CREATE TRIGGER horario_consulta_trigger
 BEFORE INSERT OR UPDATE ON consulta
 FOR EACH ROW EXECUTE FUNCTION check_horario_consulta();
 
-CREATE OR REPLACE FUNCTION remove_horario_disponivel()
-RETURNS TRIGGER AS $$
-BEGIN
-    DELETE FROM horario_disponivel
-    WHERE data = NEW.data
-    AND hora = NEW.hora;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER remove_horario_trigger
-AFTER INSERT ON consulta
-FOR EACH ROW EXECUTE FUNCTION remove_horario_disponivel();
 
 CREATE OR REPLACE FUNCTION check_medico_paciente()
 RETURNS TRIGGER AS $$
@@ -160,10 +147,6 @@ BEGIN
         RETURN NEW;
     ELSE
         -- O médico não está programado para trabalhar nesta clínica neste dia da semana
-        RAISE NOTICE 'Tentativa de inserção: nif=%', NEW.nif;
-        RAISE NOTICE 'Tentativa de inserção: nome=%', NEW.nome;
-        RAISE NOTICE 'Tentativa de inserção: data=%', NEW.data;
-        RAISE NOTICE 'Tentativa de inserção: dia_da_semana=%', EXTRACT(DOW FROM NEW.data);
         RAISE EXCEPTION 'Um médico só pode dar consultas na clínica em que trabalha no dia da semana correspondente à data da consulta';
     END IF;
 END;

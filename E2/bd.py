@@ -1,8 +1,8 @@
 import random
 from datetime import datetime, timedelta
 
-data_inicio = datetime(2025, 1, 1)
-data_fim = datetime(2026, 12, 31)
+data_inicio = datetime(2024, 1, 1)
+data_fim = datetime(2024, 2, 28)
 
 ruas_lisboa = [
     "Rua Augusta", "Avenida da Liberdade", "Rua do Ouro", "Rua da Prata", 
