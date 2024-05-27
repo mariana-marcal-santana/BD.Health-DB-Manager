@@ -104,29 +104,55 @@ def register_appointment(clinica):
     data = request.args.get("data")
     hora = request.args.get("hora")
 
-    error = None
-
     if not ssn or not nif or not data or not hora:
-        error = "Args missing."
+        return "Args missing.", 400
 
     data_now = date.today().strftime("%Y-%m-%d")
     hora_now = datetime.now().time().strftime("%H:%M:%S")
 
-    if data_now > data or (data_now == data and hora_now > hora):
-        error = "Invalid date or time."
+    hora_time = datetime.strptime(hora, "%H:%M:%S")
 
-    if error is not None:
-        return error, 400
-    
+    if data_now > data or (data_now == data and hora_now > hora) or\
+        hora_time.hour < 8 or hora_time.hour == 13 or hora_time.hour > 18 or\
+        (hora_time.minute != 0 and hora_time.minute != 30) or hora_time.second != 0:
+        return "Invalid date or time.", 400
+        
     else:
         with psycopg.connect(conninfo=DATABASE_URL) as conn:
             with conn.cursor(row_factory=namedtuple_row) as cur:
                 cur.execute(
                     """
+                    SELECT nome FROM paciente WHERE ssn = %(ssn)s;
+                    """,
+                    {"ssn": ssn}
+                )
+                if cur.fetchone() is None:
+                    return "Patient not found", 404
+                cur.execute(
+                    """
+                    SELECT nome FROM medico WHERE nif = %(nif)s;
+                    """,
+                    {"nif": nif}
+                )
+                if cur.fetchone() is None:
+                    return "Doctor not found", 404
+                cur.execute(
+                    """
+                    SELECT id FROM consulta
+                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
+                    """,
+                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+                )
+                if cur.fetchone() is not None:
+                    return "Appointment already exists", 400
+                cur.execute(
+                    """
                     SELECT id + 1 AS last_id FROM consulta ORDER BY id DESC LIMIT 1;
                     """
                 )
-                last_id = cur.fetchone()[0]
+                last_id = cur.fetchone()
+                if last_id is None:
+                    last_id = 1
                 cur.execute(
                     """
                     INSERT INTO consulta (id, nif, ssn, nome, data, hora, codigo_sns)
@@ -147,23 +173,47 @@ def cancel_appointment(clinica):
     data = request.args.get("data")
     hora = request.args.get("hora")
 
-    error = None
-
     if not ssn or not nif or not data or not hora:
-        error = "Args missing."
+        return "Args missing.", 400
 
     data_now = date.today().strftime("%Y-%m-%d")
     hora_now = datetime.now().time().strftime("%H:%M:%S")
 
-    if data_now > data or (data_now == data and hora_now > hora):
-        error = "Invalid date or time."
+    hora_time = datetime.strptime(hora, "%H:%M:%S")
 
-    if error is not None:
-        return error, 400
-    
+    if data_now > data or (data_now == data and hora_now > hora) or\
+        hora_time.hour < 8 or hora_time.hour == 13 or hora_time.hour > 18 or\
+        (hora_time.minute != 0 and hora_time.minute != 30) or hora_time.second != 0:
+        return "Invalid date or time.", 400
+
     else:
         with psycopg.connect(conninfo=DATABASE_URL) as conn:
             with conn.cursor(row_factory=namedtuple_row) as cur:
+                cur.execute(
+                    """
+                    SELECT nome FROM paciente WHERE ssn = %(ssn)s;
+                    """,
+                    {"ssn": ssn}
+                )
+                if cur.fetchone() is None:
+                    return "Patient not found", 404
+                cur.execute(
+                    """
+                    SELECT nome FROM medico WHERE nif = %(nif)s;
+                    """,
+                    {"nif": nif},
+                )
+                if cur.fetchone() is None:
+                    return "Doctor not found", 404
+                cur.execute(
+                    """
+                    SELECT id FROM consulta 
+                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
+                    """,
+                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+                )
+                if cur.fetchone() is None:
+                    return "Appointment not found", 404
                 cur.execute(
                     """
                     DELETE FROM consulta
