@@ -57,6 +57,14 @@ def clinics_specialty(clinica):
     """Shows all specialties in a clinic"""
     with psycopg.connect(conninfo=DATABASE_URL) as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(
+                """
+                SELECT nome FROM clinica WHERE nome = %(clinica)s;
+                """,
+                {"clinica": clinica},
+            )
+            if cur.fetchone() is None:
+                return "Clinic not found", 404
             specialties = cur.execute(
                 """
                 SELECT DISTINCT especialidade
@@ -76,24 +84,65 @@ def clinics_doctors_slots(clinica, especialidade):
     """Shows all doctors in a clinic with a specific specialty and the first 3 available appointment slots"""
     with psycopg.connect(conninfo=DATABASE_URL) as conn:
         with conn.cursor(row_factory=namedtuple_row) as cur:
-            doctors = cur.execute(
+            cur.execute(
                 """
-                SELECT m.nome, h.data, h.hora
-                FROM horario_disponivel h
-                    LEFT JOIN consulta c ON c.data = h.data AND c.hora = h.hora
-                    JOIN medico m ON m.nif = c.nif
-                    JOIN trabalha t ON m.nif = t.nif
-                    JOIN clinica cl ON cl.nome = t.nome
+                SELECT nome FROM clinica WHERE nome = %(clinica)s;
+                """,
+                {"clinica": clinica},
+            )
+            if cur.fetchone() is None:
+                return "Clinic not found", 404
+            cur.execute(
+                """
+                SELECT nome FROM medico WHERE especialidade = %(especialidade)s;
+                """,
+                {"especialidade": especialidade},
+            )
+            if cur.fetchone() is None:
+                return "Specialty not found", 404
+            cur.execute(
+                """
+                SELECT DISTINCT m.nif, m.nome
+                FROM medico m
+                JOIN trabalha t ON m.nif = t.nif
+                JOIN clinica cl ON cl.nome = t.nome
                 WHERE cl.nome = %(clinica)s AND m.especialidade = %(especialidade)s
-                   AND  h.data >= CURRENT_DATE AND h.hora >= CURRENT_TIME 
-                ORDER BY h.data, h.hora
-                LIMIT 3;
+                ORDER BY m.nome
                 """,
                 {"clinica": clinica, "especialidade": especialidade},
-            ).fetchall()
-            log.debug(f"Found {cur.rowcount} rows.")
+            )
+            info = []
+            for row in cur.fetchall():
+                nif, nome = row[0], row[1]
+                appointments = cur.execute(
+                    """
+                    WITH consultas_medico AS (
+                        SELECT data, hora
+                        FROM consulta
+                        WHERE nif = %(nif)s AND data >= CURRENT_DATE AND hora >= CURRENT_TIME
+                    )
+                    SELECT h.data, h.hora
+                    FROM horario_disponivel h
+                    JOIN trabalha t ON t.dia_da_semana = EXTRACT(DOW FROM h.data)
+                    LEFT JOIN consultas_medico c ON c.data = h.data AND c.hora = h.hora
+                    GROUP BY h.data, h.hora
+                    ORDER BY h.data, h.hora
+                    LIMIT 3;
+                    """,
+                    {"nif": nif},
+                ).fetchall()
+                log.debug(f"Found {cur.rowcount} rows.")
+                
+                def process_row(row):
+                    return { "data": row[0].isoformat() if row[0] else None,
+                        "hora": row[1].strftime('%H:%M:%S') if row[1] else None }
+        
+                info_medico = [process_row(row) for row in appointments]
+                info_medico.insert(0, nome)
 
-    return jsonify(doctors)
+                info += info_medico
+
+    return jsonify(info)
 
 @app.route("/a/<clinica>/registar/", methods=("POST",))
 def register_appointment(clinica):
