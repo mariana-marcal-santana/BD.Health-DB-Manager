@@ -187,12 +187,13 @@ def register_appointment(clinica):
             cur.execute(
                 """
                 SELECT id FROM consulta
-                WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
+                WHERE (nif = %(nif)s AND data = %(data)s AND hora = %(hora)s) OR
+                    (ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s);
                 """,
-                {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+                {"nif": nif, "ssn": ssn, "data": data, "hora": hora},
             )
             if cur.fetchone() is not None:
-                return "Appointment already exists", 400
+                return "Either doctor or patient already have appointment.", 400
             cur.execute(
                 """
                 SELECT id + 1 AS last_id FROM consulta ORDER BY id DESC LIMIT 1;
