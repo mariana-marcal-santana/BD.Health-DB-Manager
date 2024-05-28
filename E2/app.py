@@ -165,53 +165,52 @@ def register_appointment(clinica):
         hora_time.hour < 8 or hora_time.hour == 13 or hora_time.hour > 18 or\
         (hora_time.minute != 0 and hora_time.minute != 30) or hora_time.second != 0:
         return "Invalid date or time.", 400
-        
-    else:
-        with psycopg.connect(conninfo=DATABASE_URL) as conn:
-            with conn.cursor(row_factory=namedtuple_row) as cur:
-                cur.execute(
-                    """
-                    SELECT nome FROM paciente WHERE ssn = %(ssn)s;
-                    """,
-                    {"ssn": ssn}
-                )
-                if cur.fetchone() is None:
-                    return "Patient not found", 404
-                cur.execute(
-                    """
-                    SELECT nome FROM medico WHERE nif = %(nif)s;
-                    """,
-                    {"nif": nif}
-                )
-                if cur.fetchone() is None:
-                    return "Doctor not found", 404
-                cur.execute(
-                    """
-                    SELECT id FROM consulta
-                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
-                    """,
-                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
-                )
-                if cur.fetchone() is not None:
-                    return "Appointment already exists", 400
-                cur.execute(
-                    """
-                    SELECT id + 1 AS last_id FROM consulta ORDER BY id DESC LIMIT 1;
-                    """
-                )
-                last_id = cur.fetchone()
-                if last_id is None:
-                    last_id = 1
-                cur.execute(
-                    """
-                    INSERT INTO consulta (id, nif, ssn, nome, data, hora, codigo_sns)
-                    VALUES (%(last_id)s, %(nif)s, %(ssn)s, %(clinica)s, %(data)s, %(hora)s, NULL);
-                    """,
-                    {"last_id": last_id, "nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
-                )
 
-            conn.commit()
-        return jsonify({"message": "Appointment registered successfully"}), 200
+    with psycopg.connect(conninfo=DATABASE_URL) as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(
+                """
+                SELECT nome FROM paciente WHERE ssn = %(ssn)s;
+                """,
+                {"ssn": ssn}
+            )
+            if cur.fetchone() is None:
+                return "Patient not found", 404
+            cur.execute(
+                """
+                SELECT nome FROM medico WHERE nif = %(nif)s;
+                """,
+                {"nif": nif}
+            )
+            if cur.fetchone() is None:
+                return "Doctor not found", 404
+            cur.execute(
+                """
+                SELECT id FROM consulta
+                WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
+                """,
+                {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+            )
+            if cur.fetchone() is not None:
+                return "Appointment already exists", 400
+            cur.execute(
+                """
+                SELECT id + 1 AS last_id FROM consulta ORDER BY id DESC LIMIT 1;
+                """
+            )
+            last_id = cur.fetchone()
+            if last_id is None:
+                last_id = 1
+            cur.execute(
+                """
+                INSERT INTO consulta (id, nif, ssn, nome, data, hora, codigo_sns)
+                VALUES (%(last_id)s, %(nif)s, %(ssn)s, %(clinica)s, %(data)s, %(hora)s, NULL);
+                """,
+                {"last_id": last_id, "nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+            )
+
+        conn.commit()
+    return jsonify({"message": "Appointment registered successfully"}), 200
 
 @app.route("/a/<clinica>/cancelar/", methods=("POST",))
 def cancel_appointment(clinica):
@@ -235,43 +234,42 @@ def cancel_appointment(clinica):
         (hora_time.minute != 0 and hora_time.minute != 30) or hora_time.second != 0:
         return "Invalid date or time.", 400
 
-    else:
-        with psycopg.connect(conninfo=DATABASE_URL) as conn:
-            with conn.cursor(row_factory=namedtuple_row) as cur:
-                cur.execute(
-                    """
-                    SELECT nome FROM paciente WHERE ssn = %(ssn)s;
-                    """,
-                    {"ssn": ssn}
-                )
-                if cur.fetchone() is None:
-                    return "Patient not found", 404
-                cur.execute(
-                    """
-                    SELECT nome FROM medico WHERE nif = %(nif)s;
-                    """,
-                    {"nif": nif},
-                )
-                if cur.fetchone() is None:
-                    return "Doctor not found", 404
-                cur.execute(
-                    """
-                    SELECT id FROM consulta 
-                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
-                    """,
-                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
-                )
-                if cur.fetchone() is None:
-                    return "Appointment not found", 404
-                cur.execute(
-                    """
-                    DELETE FROM consulta
-                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
-                    """,
-                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
-                )
-            conn.commit()
-        return jsonify({"message": "Appointment canceled successfully"}), 200
+    with psycopg.connect(conninfo=DATABASE_URL) as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute(
+                """
+                SELECT nome FROM paciente WHERE ssn = %(ssn)s;
+                """,
+                {"ssn": ssn}
+            )
+            if cur.fetchone() is None:
+                return "Patient not found", 404
+            cur.execute(
+                """
+                SELECT nome FROM medico WHERE nif = %(nif)s;
+                """,
+                {"nif": nif},
+            )
+            if cur.fetchone() is None:
+                return "Doctor not found", 404
+            cur.execute(
+                """
+                SELECT id FROM consulta 
+                WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
+                """,
+                {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+            )
+            if cur.fetchone() is None:
+                return "Appointment not found", 404
+            cur.execute(
+                """
+                DELETE FROM consulta
+                WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
+                """,
+                {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+            )
+        conn.commit()
+    return jsonify({"message": "Appointment canceled successfully"}), 200
 
 if __name__ == "__main__":
     app.run()
