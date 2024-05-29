@@ -1,8 +1,8 @@
 import random
 from datetime import datetime, timedelta
 
-data_inicio = datetime(2024, 1, 1)
-data_fim = datetime(2024, 1, 15)
+data_inicio = datetime(2024, 5, 1)
+data_fim = datetime(2024, 7, 1)
 
 ruas_lisboa = [
     "Rua Augusta", "Avenida da Liberdade", "Rua do Ouro", "Rua da Prata", 
@@ -414,7 +414,7 @@ def gerar_receitas():
     global receitas
     global medicamentos
     for consulta in consultas:
-        if consulta['codigo_sns'] is not None:
+        if consulta['codigo_sns'] is not None and consulta['data'] <= datetime.now().date().strftime("%Y-%m-%d"):
             numero_medicamentos = random.randint(1, 6)
             medicamentos_escolhidos = random.sample(medicamentos, numero_medicamentos)
             for medicamento in medicamentos_escolhidos:
@@ -430,7 +430,9 @@ def gerar_observacoes():
     global sintomas
     global medicoes
     global observacoes
-    for consulta in consultas:
+    for consulta in consultas :
+        if consulta['data'] > datetime.now().date().strftime("%Y-%m-%d"):
+            continue
         numero_sintomas = random.randint(1, 5)
         sintomas_escolhidos = random.sample(sintomas, numero_sintomas)
         for sintoma in sintomas_escolhidos:
@@ -457,7 +459,7 @@ def gerar_horarios_disponiveis():
     global consultas
     
     nova_data_inicio = datetime.now().date()
-    nova_data_fim = datetime.now().date() + timedelta(days=30)
+    nova_data_fim = datetime(2024, 12, 31).date()
 
     for day in range((nova_data_fim - nova_data_inicio).days + 1):
         for hora in range(8, 19):
