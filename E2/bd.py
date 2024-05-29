@@ -2,7 +2,7 @@ import random
 from datetime import datetime, timedelta
 
 data_inicio = datetime(2024, 1, 1)
-data_fim = datetime(2024, 2, 28)
+data_fim = datetime(2024, 1, 15)
 
 ruas_lisboa = [
     "Rua Augusta", "Avenida da Liberdade", "Rua do Ouro", "Rua da Prata", 
@@ -180,15 +180,15 @@ def medicos_livres(dia_semana):
     return medicos_livres_
 
 # Funções de geração de dados
-def gerar_clinicas(num_clinicas):
+def gerar_clinicas():
     global clinicas
     ruas_lisboa = ["Rua A", "Rua B", "Rua C", "Rua D", "Rua E", "Rua F", "Rua G", "Rua H", "Rua I", "Rua J", "Rua K", "Rua L", "Rua M", "Rua N", "Rua O"]
     localidades = ["Lisboa", "Oeiras", "Cascais", "Sintra", "Amadora"]
 
-    for i in range(num_clinicas):
-        nome_clinica = f"Clinica {localidades[i % len(localidades)]} {chr(65 + i)}"
+    for localidade in localidades:
+        nome_clinica = f"Clinica {localidade}"
         telefone = "21" + "".join([str(random.randint(0, 9)) for _ in range(7)])
-        morada = f"{random.choice(ruas_lisboa)}, 1000-{random.randint(100, 999)} {random.choice(localidades)}"
+        morada = f"{random.choice(ruas_lisboa)}, 1000-{random.randint(100, 999)} {localidade}"
         clinicas.append({"nome": nome_clinica, "telefone": telefone, "morada": morada})
 
 def gerar_enfermeiros(num_enfermeiros):
@@ -649,7 +649,7 @@ def escrever_horarios():
 
 
 # Criar clinicas
-gerar_clinicas(5)
+gerar_clinicas()
 escrever_clinicas()
 print(1)
 # Criar enfermeiros
