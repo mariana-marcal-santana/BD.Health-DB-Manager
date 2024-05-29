@@ -91,7 +91,7 @@ def clinics_doctors_slots(clinica, especialidade):
                 {"clinica": clinica},
             )
             if cur.fetchone() is None:
-                return "Clinic not found", 404
+                return jsonify({"message": "Clinic not found.", "status": "error"}), 404
             cur.execute(
                 """
                 SELECT nome FROM medico WHERE especialidade = %(especialidade)s;
@@ -99,7 +99,7 @@ def clinics_doctors_slots(clinica, especialidade):
                 {"especialidade": especialidade},
             )
             if cur.fetchone() is None:
-                return "Specialty not found", 404
+                return jsonify({"message": "Specialty not found.", "status": "error"}), 404
             cur.execute(
                 """
                 SELECT DISTINCT m.nif, m.nome
@@ -175,7 +175,7 @@ def register_appointment(clinica):
                 {"ssn": ssn}
             )
             if cur.fetchone() is None:
-                return "Patient not found", 404
+                return jsonify({"message": "Patient not found.", "status": "error"}), 404
             cur.execute(
                 """
                 SELECT nome FROM medico WHERE nif = %(nif)s;
@@ -183,7 +183,7 @@ def register_appointment(clinica):
                 {"nif": nif}
             )
             if cur.fetchone() is None:
-                return "Doctor not found", 404
+                return jsonify({"message": "Doctor not found.", "status": "error"}), 404
             cur.execute(
                 """
                 SELECT id FROM consulta
@@ -193,7 +193,7 @@ def register_appointment(clinica):
                 {"nif": nif, "ssn": ssn, "data": data, "hora": hora},
             )
             if cur.fetchone() is not None:
-                return "Either doctor or patient already have appointment.", 400
+                return jsonify({"message": "Either doctor or patient already have an appointment.", "status": "error"}), 400
             cur.execute(
                 """
                 SELECT id + 1 AS last_id FROM consulta ORDER BY id DESC LIMIT 1;
@@ -244,7 +244,7 @@ def cancel_appointment(clinica):
                 {"ssn": ssn}
             )
             if cur.fetchone() is None:
-                return "Patient not found", 404
+                return jsonify({"message": "Patient not found.", "status": "error"}), 404
             cur.execute(
                 """
                 SELECT nome FROM medico WHERE nif = %(nif)s;
@@ -252,7 +252,7 @@ def cancel_appointment(clinica):
                 {"nif": nif},
             )
             if cur.fetchone() is None:
-                return "Doctor not found", 404
+                return jsonify({"message": "Doctor not found.", "status": "error"}), 404
             cur.execute(
                 """
                 SELECT id FROM consulta 
@@ -261,7 +261,7 @@ def cancel_appointment(clinica):
                 {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
             )
             if cur.fetchone() is None:
-                return "Appointment not found", 404
+                return jsonify({"message": "Appointment not found.", "status": "error"}), 404
             cur.execute(
                 """
                 DELETE FROM consulta
