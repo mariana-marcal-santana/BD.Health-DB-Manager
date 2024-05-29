@@ -5,134 +5,107 @@ DROP TABLE IF EXISTS trabalha CASCADE;
 DROP TABLE IF EXISTS paciente CASCADE;
 DROP TABLE IF EXISTS receita CASCADE;
 DROP TABLE IF EXISTS consulta CASCADE;
-DROP TABLE IF EXISTS consulta_auxiliar CASCADE;
 DROP TABLE IF EXISTS observacao CASCADE;
 DROP TABLE IF EXISTS horario_disponivel CASCADE;
+DROP FUNCTION IF EXISTS validate_data_medico_paciente(VARCHAR, VARCHAR);
+DROP FUNCTION IF EXISTS check_medico_clinica_dia();
 
-----------------------------------------
--- Table Creation
-----------------------------------------
 
 CREATE TABLE clinica(
-    nome VARCHAR(80) PRIMARY KEY,
-    telefone VARCHAR(15) UNIQUE NOT NULL CHECK (telefone ~ '^[0-9]+$'),
-    morada VARCHAR(255) UNIQUE NOT NULL
+	nome VARCHAR(80) PRIMARY KEY,
+	telefone VARCHAR(15) UNIQUE NOT NULL CHECK (telefone ~ '^[0-9]+$'),
+	morada VARCHAR(255) UNIQUE NOT NULL
 );
 
 CREATE TABLE enfermeiro(
-    nif CHAR(9) PRIMARY KEY CHECK (nif ~ '^[0-9]+$'),
-    nome VARCHAR(80) UNIQUE NOT NULL,
-    telefone VARCHAR(15) NOT NULL CHECK (telefone ~ '^[0-9]+$'),
-    morada VARCHAR(255) NOT NULL,
-    nome_clinica VARCHAR(80) NOT NULL REFERENCES clinica (nome)
+	nif CHAR(9) PRIMARY KEY CHECK (nif ~ '^[0-9]+$'),
+	nome VARCHAR(80) UNIQUE NOT NULL,
+	telefone VARCHAR(15) NOT NULL CHECK (telefone ~ '^[0-9]+$'),
+	morada VARCHAR(255) NOT NULL,
+	nome_clinica VARCHAR(80) NOT NULL REFERENCES clinica (nome)
 );
 
 CREATE TABLE medico(
-    nif CHAR(9) PRIMARY KEY CHECK (nif ~ '^[0-9]+$'),
-    nome VARCHAR(80) UNIQUE NOT NULL,
-    telefone VARCHAR(15) NOT NULL CHECK (telefone ~ '^[0-9]+$'),
-    morada VARCHAR(255) NOT NULL,
-    especialidade VARCHAR(80) NOT NULL
+	nif CHAR(9) PRIMARY KEY CHECK (nif ~ '^[0-9]+$'),
+	nome VARCHAR(80) UNIQUE NOT NULL,
+	telefone VARCHAR(15) NOT NULL CHECK (telefone ~ '^[0-9]+$'),
+	morada VARCHAR(255) NOT NULL,
+	especialidade VARCHAR(80) NOT NULL
 );
 
 CREATE TABLE trabalha(
-    nif CHAR(9) NOT NULL REFERENCES medico(nif),
-    nome VARCHAR(80) NOT NULL REFERENCES clinica(nome),
-    dia_da_semana SMALLINT,
-    PRIMARY KEY (nif, nome, dia_da_semana)
+nif CHAR(9) NOT NULL REFERENCES medico,
+nome VARCHAR(80) NOT NULL REFERENCES clinica,
+dia_da_semana SMALLINT,
+PRIMARY KEY (nif, dia_da_semana)
 );
 
 CREATE TABLE paciente(
-    ssn CHAR(11) PRIMARY KEY CHECK (ssn ~ '^[0-9]+$'),
-    nif CHAR(9) UNIQUE NOT NULL CHECK (nif ~ '^[0-9]+$'),
-    nome VARCHAR(80) NOT NULL,
-    telefone VARCHAR(15) NOT NULL CHECK (telefone ~ '^[0-9]+$'),
-    morada VARCHAR(255) NOT NULL,
-    data_nasc DATE NOT NULL
-);
-
-CREATE TABLE consulta_auxiliar(
-    id SERIAL PRIMARY KEY,
-    ssn CHAR(11) NOT NULL REFERENCES paciente(ssn),
-    data DATE NOT NULL,
-    hora TIME NOT NULL,
-    codigo_sns CHAR(12) UNIQUE CHECK (codigo_sns ~ '^[0-9]+$'),
-    UNIQUE(ssn, data, hora)
+	ssn CHAR(11) PRIMARY KEY CHECK (ssn ~ '^[0-9]+$'),
+nif CHAR(9) UNIQUE NOT NULL CHECK (nif ~ '^[0-9]+$'),
+	nome VARCHAR(80) NOT NULL,
+	telefone VARCHAR(15) NOT NULL CHECK (telefone ~ '^[0-9]+$'),
+	morada VARCHAR(255) NOT NULL,
+	data_nasc DATE NOT NULL
 );
 
 CREATE TABLE consulta(
-    id SERIAL PRIMARY KEY,
-    ssn CHAR(11) NOT NULL REFERENCES paciente(ssn),
-    nif CHAR(9) NOT NULL REFERENCES medico(nif),
-    nome VARCHAR(80) NOT NULL REFERENCES clinica(nome),
-    data DATE NOT NULL,
-    hora TIME NOT NULL,
-    codigo_sns CHAR(12) UNIQUE CHECK (codigo_sns ~ '^[0-9]+$'),
-    UNIQUE(ssn, data, hora),
-    UNIQUE(nif, data, hora)
+	id SERIAL PRIMARY KEY,
+	ssn CHAR(11) NOT NULL REFERENCES paciente,
+	nif CHAR(9) NOT NULL REFERENCES medico,
+	nome VARCHAR(80) NOT NULL REFERENCES clinica,
+	data DATE NOT NULL,
+	hora TIME NOT NULL,
+	codigo_sns CHAR(12) UNIQUE CHECK (codigo_sns ~ '^[0-9]+$'),
+	UNIQUE(ssn, data, hora),
+	UNIQUE(nif, data, hora)
+);
+
+
+CREATE TABLE horario_disponivel(
+    data DATE,
+    hora TIME
 );
 
 CREATE TABLE receita(
-    codigo_sns VARCHAR(12) NOT NULL REFERENCES consulta(codigo_sns),
-    medicamento VARCHAR(155) NOT NULL,
-    quantidade SMALLINT NOT NULL CHECK (quantidade > 0),
-    PRIMARY KEY (codigo_sns, medicamento)
+	codigo_sns VARCHAR(12) NOT NULL REFERENCES consulta (codigo_sns),
+	medicamento VARCHAR(155) NOT NULL,
+	quantidade SMALLINT NOT NULL CHECK (quantidade > 0),
+	PRIMARY KEY (codigo_sns, medicamento)
 );
 
 CREATE TABLE observacao(
-    id INTEGER NOT NULL REFERENCES consulta(id),
-    parametro VARCHAR(155) NOT NULL,
-    valor FLOAT,
-    PRIMARY KEY (id, parametro)
+	id INTEGER NOT NULL REFERENCES consulta,
+	parametro VARCHAR(155) NOT NULL,
+	valor FLOAT,
+PRIMARY KEY (id, parametro)
 );
 
-CREATE TABLE horario_disponivel(
-    data DATE NOT NULL,
-    hora TIME NOT NULL,
-    PRIMARY KEY (data, hora)
+ALTER TABLE consulta
+ADD CONSTRAINT check_horario_consulta
+CHECK (
+    hora >= '08:00:00' AND hora <= '18:30:00' 
+    AND hora NOT IN ('13:00:00', '13:30:00')
+    AND EXTRACT(MINUTE FROM hora) IN (0, 30)
+    AND EXTRACT(SECOND FROM hora) = 0
 );
-
-----------------------------------------
--- Restrictions and Triggers
-----------------------------------------
-
-CREATE OR REPLACE FUNCTION check_horario_consulta()
-RETURNS TRIGGER AS $$
-BEGIN  
-    IF NEW.hora >= '08:00:00' AND NEW.hora <= '18:30:00' 
-        AND NOT NEW.hora = '13:00:00' THEN 
-        RETURN NEW;
-    ELSE
-        RAISE EXCEPTION 'A consulta deve ser agendada entre as 8h e as 19h, exceto entre as 13h e às 14h';
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER horario_consulta_trigger
-BEFORE INSERT OR UPDATE ON consulta
-FOR EACH ROW EXECUTE FUNCTION check_horario_consulta();
-
-
-CREATE OR REPLACE FUNCTION check_medico_paciente()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION validate_data_medico_paciente(new_nif VARCHAR, new_ssn VARCHAR)
+RETURNS BOOLEAN AS $$
 DECLARE
-    paciente_nif CHAR(9);
+    match_count INTEGER;
 BEGIN
-    -- Verificar se o paciente é um médico
-    SELECT nif INTO paciente_nif FROM paciente WHERE ssn = NEW.ssn;
+    SELECT COUNT(*) INTO match_count
+    FROM paciente p
+    WHERE p.nif = new_nif AND p.ssn = new_ssn;
 
-    -- Verificar se o NIF do médico é igual ao NIF do paciente
-    IF paciente_nif = NEW.nif THEN
-        RAISE EXCEPTION 'Um médico não pode consultar a si próprio ou a um paciente com o mesmo NIF';
-    END IF;
-    
-    RETURN NEW;
+    RETURN match_count = 0;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER medico_paciente_trigger
-BEFORE INSERT OR UPDATE ON consulta
-FOR EACH ROW EXECUTE FUNCTION check_medico_paciente();
+ALTER TABLE consulta
+ADD CONSTRAINT check_data_medico_paciente CHECK (
+    validate_data_medico_paciente(nif, ssn)
+);
 
 CREATE OR REPLACE FUNCTION check_medico_clinica_dia()
 RETURNS TRIGGER AS $$
