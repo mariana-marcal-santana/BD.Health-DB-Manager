@@ -180,21 +180,6 @@ def gerar_medicos():
             "especialidade": especialidade
         })
 
-def get_medicos_sem_trabalho_suficiente():
-    global medicos
-    global trabalha
-    medicos_sem_trabalho, trabalho = [], 0
-
-    for medico in medicos:
-        for item in trabalha:
-            if item['nif'] == medico['nif']:
-                trabalho += 1
-        if trabalho < 2:
-            medicos_sem_trabalho.append([medico, trabalho])
-        trabalho = 0
-
-    return medicos_sem_trabalho
-
 def gerar_trabalha():
 
     global trabalha
@@ -214,28 +199,17 @@ def gerar_trabalha():
                     "dia_da_semana": i
                 })
 
-    medicos_s_trabalho = get_medicos_sem_trabalho_suficiente()
 
-    for medico, dias in medicos_s_trabalho:
-
-        dias = 2 - dias
-        dias_trabalho = random.sample(range(7), dias)
-        clinicas_possiveis = random.sample(clinicas, dias)
-
-        while medico in get_medicos_clinica(dias_trabalho[0], clinicas_possiveis[0]) or\
-            medico in get_medicos_clinica(dias_trabalho[1], clinicas_possiveis[1]) or\
-            dias_trabalho[0] == dias_trabalho[1]:
-
-            dias_trabalho = random.sample(range(7), dias)
-            clinicas_possiveis = random.sample(clinicas, dias)
-        
-        for i in range(dias):
-            trabalha.append({
-                "nif": medico['nif'],
-                "nome": clinicas_possiveis[i]['nome'],
-                "dia_da_semana": dias_trabalho[i]
-            })
-
+    for medico in medicos:
+        for dia in range(7):
+            if not any(item['nif'] == medico['nif'] and item['dia_da_semana'] == dia for item in trabalha):
+                clinica = random.choice(clinicas)   
+                trabalha.append({
+                    "nif": medico['nif'],
+                    "nome": clinica['nome'],
+                    "dia_da_semana": dia
+                })
+    
 def gerar_pacientes(num_pacientes, nif_inicial):
     global pacientes
     localidades = ['Alfama', 'Baixa', 'Belém', 'Chiado', 'Graça', 'Mouraria', 'Parque das Nações', 'Restelo', 'Areeiro', 'Campo de Ourique']
