@@ -368,7 +368,8 @@ def gerar_consultas_clinicas():
                 }
                 id_consulta += 1
                 consultas.append(consulta)
-            
+
+    
 def gerar_consultas():
     gerar_consultas_pacientes()
     gerar_consultas_medicos()   
@@ -378,7 +379,11 @@ def gerar_consultas():
         consulta = consultas[i]
         if consulta['codigo_sns'] is None and consulta['data'] <= datetime.now().date().strftime("%Y-%m-%d"):
             if random.randint(1, 10) <= 8:
-                consulta['codigo_sns'] = gerar_codigo_sns()  
+                codigo = gerar_codigo_sns()
+                while any(item['codigo_sns'] == codigo for item in consultas):
+                    codigo = gerar_codigo_sns()
+                consultas[i]['codigo_sns'] = codigo
+
     
 def gerar_codigo_sns():
     return ''.join([str(random.randint(0, 9)) for _ in range(12)])
