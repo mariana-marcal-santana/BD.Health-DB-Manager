@@ -42,7 +42,7 @@ PRIMARY KEY (nif, dia_da_semana)
 
 CREATE TABLE paciente(
 	ssn CHAR(11) PRIMARY KEY CHECK (ssn ~ '^[0-9]+$'),
-nif CHAR(9) UNIQUE NOT NULL CHECK (nif ~ '^[0-9]+$'),
+	nif CHAR(9) UNIQUE NOT NULL CHECK (nif ~ '^[0-9]+$'),
 	nome VARCHAR(80) NOT NULL,
 	telefone VARCHAR(15) NOT NULL CHECK (telefone ~ '^[0-9]+$'),
 	morada VARCHAR(255) NOT NULL,

@@ -169,17 +169,16 @@ def register_appointment(clinica):
     hora = request.args.get("hora")
 
     if not ssn or not nif or not data or not hora:
-        return "Args missing.", 400
+        return jsonify({"message": "Missing arguments.", "status": "error"}), 400
 
     data_now = date.today().strftime("%Y-%m-%d")
     hora_now = datetime.now().time().strftime("%H:%M:%S")
-
     hora_time = datetime.strptime(hora, "%H:%M:%S")
 
     if data_now > data or (data_now == data and hora_now > hora) or\
         hora_time.hour < 8 or hora_time.hour == 13 or hora_time.hour > 18 or\
         (hora_time.minute != 0 and hora_time.minute != 30) or hora_time.second != 0:
-        return "Invalid date or time.", 400
+        return jsonify({"message": "Invalid date or time.", "status": "error"}), 400
     try:
         with psycopg.connect(conninfo=DATABASE_URL) as conn:
             conn.autocommit = True
@@ -219,7 +218,6 @@ def register_appointment(clinica):
                 last_id = cur.fetchone()
                 if last_id is None:
                     last_id = 1
-                conn.begin()
                 cur.execute(
                     """
                     INSERT INTO consulta (id, nif, ssn, nome, data, hora, codigo_sns)
@@ -227,14 +225,13 @@ def register_appointment(clinica):
                     """,
                     {"last_id": last_id, "nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
                 )
-                conn.commit()
                 log.debug(f"Inserted {cur.rowcount} row(s).")
                 return jsonify({"message": "Appointment registered successfully"}), 200
     except Exception as e:
         log.error(f"An error occurred: {e}")
         return "An error occurred", 500
 
-@app.route("/a/<clinica>/cancelar/", methods=("POST",))
+@app.route("/a/<clinica>/cancelar/", methods=("DELETE","POST",))
 def cancel_appointment(clinica):
     """Cancels an appointment in a clinic"""
 
@@ -244,7 +241,7 @@ def cancel_appointment(clinica):
     hora = request.args.get("hora")
 
     if not ssn or not nif or not data or not hora:
-        return "Args missing.", 400
+        return jsonify({"message": "Missing arguments.", "status": "error"}), 400
 
     data_now = date.today().strftime("%Y-%m-%d")
     hora_now = datetime.now().time().strftime("%H:%M:%S")
@@ -254,7 +251,7 @@ def cancel_appointment(clinica):
     if data_now > data or (data_now == data and hora_now > hora) or\
         hora_time.hour < 8 or hora_time.hour == 13 or hora_time.hour > 18 or\
         (hora_time.minute != 0 and hora_time.minute != 30) or hora_time.second != 0:
-        return "Invalid date or time.", 400
+        return jsonify({"message": "Invalid date or time.", "status": "error"}), 400
     try:
         with psycopg.connect(conninfo=DATABASE_URL) as conn:
             conn.autocommit = True
