@@ -178,7 +178,6 @@ def register_appointment(clinica):
             )
             if cur.fetchone() is None:
                 return jsonify({"message": "Clinic not found.", "status": "error"}), 404
-            cur.execute("SELECT * FROM consulta FOR UPDATE")
             cur.execute(
                 """
                 SELECT nome FROM paciente WHERE ssn = %(ssn)s;
@@ -195,6 +194,9 @@ def register_appointment(clinica):
             )
             if cur.fetchone() is None:
                 return jsonify({"message": "Doctor not found.", "status": "error"}), 400
+            
+            cur.execute("SELECT * FROM consulta FOR UPDATE")
+            
             cur.execute(
                 """
                 SELECT id FROM consulta
