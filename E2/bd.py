@@ -180,21 +180,6 @@ def gerar_medicos():
             "especialidade": especialidade
         })
 
-def get_medicos_sem_trabalho_suficiente():
-    global medicos
-    global trabalha
-    medicos_sem_trabalho, trabalho = [], 0
-
-    for medico in medicos:
-        for item in trabalha:
-            if item['nif'] == medico['nif']:
-                trabalho += 1
-        if trabalho < 2:
-            medicos_sem_trabalho.append([medico, trabalho])
-        trabalho = 0
-
-    return medicos_sem_trabalho
-
 def gerar_trabalha():
 
     global trabalha
@@ -203,38 +188,12 @@ def gerar_trabalha():
 
     for i in range(7):
         for clinica in clinicas:
-            
-            medicos_livres_dia = medicos_livres(i)
-
-            for j in range(8):
-
+            for medico in medicos:
                 trabalha.append({
-                    "nif": medicos_livres_dia[j]['nif'],
+                    "nif": medico['nif'],
                     "nome": clinica['nome'],
                     "dia_da_semana": i
                 })
-
-    medicos_s_trabalho = get_medicos_sem_trabalho_suficiente()
-
-    for medico, dias in medicos_s_trabalho:
-
-        dias = 2 - dias
-        dias_trabalho = random.sample(range(7), dias)
-        clinicas_possiveis = random.sample(clinicas, dias)
-
-        while medico in get_medicos_clinica(dias_trabalho[0], clinicas_possiveis[0]) or\
-            medico in get_medicos_clinica(dias_trabalho[1], clinicas_possiveis[1]) or\
-            dias_trabalho[0] == dias_trabalho[1]:
-
-            dias_trabalho = random.sample(range(7), dias)
-            clinicas_possiveis = random.sample(clinicas, dias)
-        
-        for i in range(dias):
-            trabalha.append({
-                "nif": medico['nif'],
-                "nome": clinicas_possiveis[i]['nome'],
-                "dia_da_semana": dias_trabalho[i]
-            })
 
 def gerar_pacientes(num_pacientes, nif_inicial):
     global pacientes
