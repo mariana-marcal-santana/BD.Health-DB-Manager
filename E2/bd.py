@@ -188,13 +188,28 @@ def gerar_trabalha():
 
     for i in range(7):
         for clinica in clinicas:
-            for medico in medicos:
+            
+            medicos_livres_dia = medicos_livres(i)
+
+            for j in range(8):
+
                 trabalha.append({
-                    "nif": medico['nif'],
+                    "nif": medicos_livres_dia[j]['nif'],
                     "nome": clinica['nome'],
                     "dia_da_semana": i
                 })
 
+
+    for medico in medicos:
+        for dia in range(7):
+            if not any(item['nif'] == medico['nif'] and item['dia_da_semana'] == dia for item in trabalha):
+                clinica = random.choice(clinicas)   
+                trabalha.append({
+                    "nif": medico['nif'],
+                    "nome": clinica['nome'],
+                    "dia_da_semana": dia
+                })
+    
 def gerar_pacientes(num_pacientes, nif_inicial):
     global pacientes
     localidades = ['Alfama', 'Baixa', 'Belém', 'Chiado', 'Graça', 'Mouraria', 'Parque das Nações', 'Restelo', 'Areeiro', 'Campo de Ourique']
