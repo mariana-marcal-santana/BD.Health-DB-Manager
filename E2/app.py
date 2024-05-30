@@ -182,7 +182,9 @@ def register_appointment(clinica):
         return "Invalid date or time.", 400
     try:
         with psycopg.connect(conninfo=DATABASE_URL) as conn:
+            conn.autocommit = True
             with conn.cursor(row_factory=namedtuple_row) as cur:
+                cur.execute("SELECT * FROM consulta FOR UPDATE")
                 cur.execute(
                     """
                     SELECT nome FROM paciente WHERE ssn = %(ssn)s;
@@ -255,6 +257,7 @@ def cancel_appointment(clinica):
         return "Invalid date or time.", 400
     try:
         with psycopg.connect(conninfo=DATABASE_URL) as conn:
+            conn.autocommit = True
             with conn.cursor(row_factory=namedtuple_row) as cur:
                 cur.execute(
                     """
@@ -281,16 +284,19 @@ def cancel_appointment(clinica):
                 )
                 if cur.fetchone() is None:
                     return jsonify({"message": "Appointment not found.", "status": "error"}), 404
-                
-                conn.begin()
+
                 cur.execute(
                     """
+                    SELECT * FROM consulta 
+                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s
+                    FOR UPDATE
+                    
                     DELETE FROM consulta
                     WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
                     """,
                     {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
                 )
-                conn.commit()
+
                 return jsonify({"message": "Appointment canceled successfully"}), 200
             
     except Exception as e:
