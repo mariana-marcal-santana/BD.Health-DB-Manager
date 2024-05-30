@@ -56,12 +56,12 @@ sintomas = [
     'Diarreia', 'Constipação', 'Dor no peito', 'Dor nas articulações', 'Dor muscular',
     'Arrepios', 'Suores noturnos', 'Palpitações', 'Confusão mental', 'Visão turva',
     'Zumbido nos ouvidos', 'Formigamento', 'Comichão', 'Erupção cutânea', 'Inchaço',
-    'Icterícia', 'Tosse com sangue', 'Dificuldade para engolir', 'Rigidez matinal',
-    'Perda de peso inexplicável', 'Incontinência urinária', 'Urgência urinária', 'Dores de garganta',
+    'Icterícia', 'Tosse com sangue', 'Dificuldade para engolir',
+    'Perda de peso inexplicável', 'Incontinência', 'Dores de garganta',
     'Rouquidão', 'Sonolência', 'Alterações de humor', 'Depressão', 'Ansiedade',
     'Insônia', 'Pesadelos', 'Paralisia', 'Espasmos musculares', 'Fraqueza',
     'Tremores', 'Sensação de desmaio', 'Desmaios', 'Dor na lombar', 'Dor de dentes',
-    'Queimação ao urinar', 'Alterações no paladar'
+    'Alterações no paladar'
 ]
 
 medicoes = [
@@ -374,11 +374,11 @@ def gerar_consultas():
     gerar_consultas_medicos()   
     gerar_consultas_clinicas()
     
-    tamanho = int (len(consultas) * 0.8)
-    for i in range(tamanho):
+    for i in range(len(consultas)):
         consulta = consultas[i]
-        if consulta['codigo_sns'] is None:
-            consulta['codigo_sns'] = gerar_codigo_sns()  
+        if consulta['codigo_sns'] is None and consulta['data'] <= datetime.now().date().strftime("%Y-%m-%d"):
+            if random.randint(1, 10) <= 8:
+                consulta['codigo_sns'] = gerar_codigo_sns()  
     
 def gerar_codigo_sns():
     return ''.join([str(random.randint(0, 9)) for _ in range(12)])
