@@ -1,6 +1,3 @@
-#!/usr/bin/python3
-# Copyright (c) BDist Development Team
-# Distributed under the terms of the Modified BSD License.
 import os
 from logging.config import dictConfig
 
@@ -10,7 +7,7 @@ from psycopg.rows import namedtuple_row
 from datetime import date, time, datetime
 
 # Use the DATABASE_URL environment variable if it exists, otherwise use the default.
-# Use the format postgres://username:password@hostname/database_name to connect to the database.
+# postgres://username:password@hostname/database_name to connect to the database.
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgres://saude:saude@postgres/saude")
 
 dictConfig(
