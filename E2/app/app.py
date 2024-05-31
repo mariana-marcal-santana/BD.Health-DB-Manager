@@ -92,7 +92,7 @@ def clinics_doctors_slots(clinica, especialidade):
                 return jsonify({"message": "Clinic not found.", "status": "error"}), 404
             cur.execute(
                 """
-                SELECT *
+                SELECT c.nome
                 FROM clinica c
                 JOIN trabalha t ON t.nome = c.nome
                 JOIN medico m ON m.nif = t.nif
@@ -170,81 +170,80 @@ def register_appointment(clinica):
         hora_time.hour < 8 or hora_time.hour == 13 or hora_time.hour > 18 or\
         (hora_time.minute != 0 and hora_time.minute != 30) or hora_time.second != 0:
         return jsonify({"message": "Invalid date or time.", "status": "error"}), 400
-        
-    else:
-        with psycopg.connect(conninfo=DATABASE_URL) as conn:
-            with conn.cursor(row_factory=namedtuple_row) as cur:
-                cur.execute("""SELECT * FROM consulta FOR UPDATE;""")
-                cur.execute(
-                    """
-                    SELECT nome FROM clinica WHERE nome = %(clinica)s;
-                    """,
-                    {"clinica": clinica},
-                )
-                if cur.fetchone() is None:
-                    return jsonify({"message": "Clinic not found.", "status": "error"}), 404
-                cur.execute(
-                    """
-                    SELECT nome FROM paciente WHERE ssn = %(ssn)s;
-                    """,
-                    {"ssn": ssn}
-                )
-                if cur.fetchone() is None:
-                    return jsonify({"message": "Patient not found.", "status": "error"}), 400
-                cur.execute(
-                    """
-                    SELECT nome FROM medico WHERE nif = %(nif)s;
-                    """,
-                    {"nif": nif}
-                )
-                if cur.fetchone() is None:
-                    return jsonify({"message": "Doctor not found.", "status": "error"}), 400
-                cur.execute(
-                    """
-                    SELECT * FROM paciente
-                    WHERE nif = %(nif)s AND ssn = %(ssn)s;
-                    """,
-                    {"nif": nif, "ssn": ssn}
-                )
-                if cur.fecthone() is not None:
-                    return jsonify({"message": "Doctor and patient can't be the same person.", "status": "error"}), 400
-                cur.execute(
-                    """
-                    SELECT * FROM trabalha 
-                    WHERE nif = %(nif)s AND nome = %(clinica)s AND 
-                          dia_da_semana = EXTRACT(DOW FROM %(data)s::DATE);
-                    """,
-                    {"nif": nif, "clinica": clinica, "data":data}
-                )
-                if cur.fetchone() is None:
-                    return jsonify({"message": "Doctor doesn't work in the clinic in this day.", "status": "error"}), 400
-                cur.execute(
-                    """
-                    SELECT id FROM consulta
-                    WHERE (nif = %(nif)s AND data = %(data)s AND hora = %(hora)s) OR
-                        (ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s);
-                    """,
-                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora},
-                )
-                if cur.fetchone() is not None:
-                    return jsonify({"message": "Either doctor or patient already have an appointment.", "status": "error"}), 400
-                cur.execute(
-                    """
-                    SELECT id + 1 AS last_id FROM consulta ORDER BY id DESC LIMIT 1;
-                    """
-                )
-                last_id = cur.fetchone()
-                if last_id is None: last_id = 1
-                else: last_id = last_id.last_id
-                cur.execute(
-                    """
-                    INSERT INTO consulta (id, nif, ssn, nome, data, hora, codigo_sns)
-                    VALUES (%(last_id)s, %(nif)s, %(ssn)s, %(clinica)s, %(data)s, %(hora)s, NULL);
-                    """,
-                    {"last_id": last_id, "nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
-                )
 
-        return jsonify({"message": "Appointment registered successfully"}), 200
+    with psycopg.connect(conninfo=DATABASE_URL) as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute("""SELECT * FROM consulta FOR UPDATE;""")
+            cur.execute(
+                """
+                SELECT nome FROM clinica WHERE nome = %(clinica)s;
+                """,
+                {"clinica": clinica},
+            )
+            if cur.fetchone() is None:
+                return jsonify({"message": "Clinic not found.", "status": "error"}), 404
+            cur.execute(
+                """
+                SELECT nome FROM paciente WHERE ssn = %(ssn)s;
+                """,
+                {"ssn": ssn}
+            )
+            if cur.fetchone() is None:
+                return jsonify({"message": "Patient not found.", "status": "error"}), 400
+            cur.execute(
+                """
+                SELECT nome FROM medico WHERE nif = %(nif)s;
+                """,
+                {"nif": nif}
+            )
+            if cur.fetchone() is None:
+                return jsonify({"message": "Doctor not found.", "status": "error"}), 400
+            cur.execute(
+                """
+                SELECT * FROM paciente
+                WHERE nif = %(nif)s AND ssn = %(ssn)s;
+                """,
+                {"nif": nif, "ssn": ssn}
+            )
+            if cur.fetchone() is not None:
+                return jsonify({"message": "Doctor and patient can't be the same person.", "status": "error"}), 400
+            cur.execute(
+                """
+                SELECT * FROM trabalha 
+                WHERE nif = %(nif)s AND nome = %(clinica)s AND 
+                      dia_da_semana = EXTRACT(DOW FROM %(data)s::DATE);
+                """,
+                {"nif": nif, "clinica": clinica, "data":data}
+            )
+            if cur.fetchone() is None:
+                return jsonify({"message": "Doctor doesn't work in the clinic in this day.", "status": "error"}), 400
+            cur.execute(
+                """
+                SELECT id FROM consulta
+                WHERE (nif = %(nif)s AND data = %(data)s AND hora = %(hora)s) OR
+                    (ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s);
+                """,
+                {"nif": nif, "ssn": ssn, "data": data, "hora": hora},
+            )
+            if cur.fetchone() is not None:
+                return jsonify({"message": "Either doctor or patient already have an appointment.", "status": "error"}), 400
+            cur.execute(
+                """
+                SELECT id + 1 AS last_id FROM consulta ORDER BY id DESC LIMIT 1;
+                """
+            )
+            last_id = cur.fetchone()
+            if last_id is None: last_id = 1
+            else: last_id = last_id.last_id
+            cur.execute(
+                """
+                INSERT INTO consulta (id, nif, ssn, nome, data, hora, codigo_sns)
+                VALUES (%(last_id)s, %(nif)s, %(ssn)s, %(clinica)s, %(data)s, %(hora)s, NULL);
+                """,
+                {"last_id": last_id, "nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+            )
+
+    return jsonify({"message": "Appointment registered successfully"}), 200
 
 @app.route("/a/<clinica>/cancelar/", methods=("DELETE", "POST",))
 def cancel_appointment(clinica):
@@ -268,52 +267,51 @@ def cancel_appointment(clinica):
         (hora_time.minute != 0 and hora_time.minute != 30) or hora_time.second != 0:
         return jsonify({"message": "Invalid date or time.", "status": "error"}), 400
 
-    else:
-        with psycopg.connect(conninfo=DATABASE_URL) as conn:
-            with conn.cursor(row_factory=namedtuple_row) as cur:
-                cur.execute("""SELECT * FROM consulta FOR UPDATE;""")
-                cur.execute(
-                    """
-                    SELECT nome FROM clinica WHERE nome = %(clinica)s;
-                    """,
-                    {"clinica": clinica},
-                )
-                if cur.fetchone() is None:
-                    return jsonify({"message": "Clinic not found.", "status": "error"}), 404
-                cur.execute(
-                    """
-                    SELECT nome FROM paciente WHERE ssn = %(ssn)s;
-                    """,
-                    {"ssn": ssn}
-                )
-                if cur.fetchone() is None:
-                    return jsonify({"message": "Patient not found.", "status": "error"}), 400
-                cur.execute(
-                    """
-                    SELECT nome FROM medico WHERE nif = %(nif)s;
-                    """,
-                    {"nif": nif},
-                )
-                if cur.fetchone() is None:
-                    return jsonify({"message": "Doctor not found.", "status": "error"}), 400
-                cur.execute(
-                    """
-                    SELECT id FROM consulta 
-                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
-                    """,
-                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
-                )
-                if cur.fetchone() is None:
-                    return jsonify({"message": "Appointment not found.", "status": "error"}), 400
-                cur.execute(
-                    """
-                    DELETE FROM consulta
-                    WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
-                    """,
-                    {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
-                )
+    with psycopg.connect(conninfo=DATABASE_URL) as conn:
+        with conn.cursor(row_factory=namedtuple_row) as cur:
+            cur.execute("""SELECT * FROM consulta FOR UPDATE;""")
+            cur.execute(
+                """
+                SELECT nome FROM clinica WHERE nome = %(clinica)s;
+                """,
+                {"clinica": clinica},
+            )
+            if cur.fetchone() is None:
+                return jsonify({"message": "Clinic not found.", "status": "error"}), 404
+            cur.execute(
+                """
+                SELECT nome FROM paciente WHERE ssn = %(ssn)s;
+                """,
+                {"ssn": ssn}
+            )
+            if cur.fetchone() is None:
+                return jsonify({"message": "Patient not found.", "status": "error"}), 400
+            cur.execute(
+                """
+                SELECT nome FROM medico WHERE nif = %(nif)s;
+                """,
+                {"nif": nif},
+            )
+            if cur.fetchone() is None:
+                return jsonify({"message": "Doctor not found.", "status": "error"}), 400
+            cur.execute(
+                """
+                SELECT id FROM consulta 
+                WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
+                """,
+                {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+            )
+            if cur.fetchone() is None:
+                return jsonify({"message": "Appointment not found.", "status": "error"}), 400
+            cur.execute(
+                """
+                DELETE FROM consulta
+                WHERE nif = %(nif)s AND ssn = %(ssn)s AND data = %(data)s AND hora = %(hora)s AND nome = %(clinica)s;
+                """,
+                {"nif": nif, "ssn": ssn, "data": data, "hora": hora, "clinica": clinica},
+            )
 
-        return jsonify({"message": "Appointment canceled successfully"}), 200
+    return jsonify({"message": "Appointment canceled successfully"}), 200
 
 
 if __name__ == "__main__":
